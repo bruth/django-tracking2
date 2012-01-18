@@ -69,10 +69,12 @@ urlpatterns = patterns('',
 These urls are protected by a custom Django permission `tracking.view_visitor`.
 Thus only superusers and users granted this permission can view these pages.
 
-**Available URLs**
+Available URLs
+--------------
 * `/dashboard/` - overview of all visitor activity
 
-**Templates**
+Templates
+---------
 * `tracking/dashboard.html` - for the dashboard page
 * `tracking/snippets/stats.html` - standalone content for the dashboard page
   (simplifies overriding templates)
