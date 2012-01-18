@@ -70,16 +70,13 @@ if len(sys.argv) > 1 and sys.argv[1] == 'bdist_wininst':
 
 version = __import__(BASE_PACKAGE).get_version()
 
-readme = open('README.md')
-description = readme.read()
-readme.close()
-
 setup(
     version = version,
     name = 'django-tracking2',
     author = 'Byron Ruth',
     author_email = 'b@devel.io',
-    description = description,
+    description = 'django-tracking2 tracks the length of time visitors '\
+        'and registered users spend on your site',
     license = 'BSD',
     keywords = 'visitor tracking time analytics',
     url = 'https://github.com/bruth/django-tracking2',
