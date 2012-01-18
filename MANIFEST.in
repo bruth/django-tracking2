@@ -1,1 +1,2 @@
 global-exclude .DS_Store
+include README.md
