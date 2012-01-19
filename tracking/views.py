@@ -1,10 +1,9 @@
 import logging
 import calendar
-from datetime import date
+from datetime import date, timedelta
 from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
 from tracking.models import Visitor
-from tracking import utils
 
 log = logging.getLogger(__file__)
 
@@ -43,7 +42,8 @@ def stats(request):
     user_stats = list(Visitor.objects.user_stats(start_date, end_date).order_by('time_on_site_avg'))
     for u in user_stats:
         if u.time_on_site_avg is not None:
-            u.time_on_site_avg = utils.pretty_timedelta(u.time_on_site_avg)
+            # Lop off the floating point
+            u.time_on_site_avg = timedelta(seconds=int(u.time_on_site_avg))
 
     return render(request, 'tracking/dashboard.html', {
         'visitor_stats': Visitor.objects.stats(start_date, end_date),

@@ -4,15 +4,6 @@ headers = ('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED',
     'HTTP_X_CLUSTERED_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED',
     'REMOTE_ADDR')
 
-def pretty_timedelta(seconds):
-    hours, remainder = divmod(seconds, 3600)
-    minutes, seconds = divmod(remainder, 60)
-    if hours:
-        return '%d:%d:%d' % (hours, minutes, seconds)
-    if minutes:
-        return '%d:%d' % (minutes, seconds)
-    return '%s' % seconds
-
 # Back ported from Django trunk
 # This code was mostly based on ipaddr-py
 # Copyright 2007 Google Inc. http://code.google.com/p/ipaddr-py/

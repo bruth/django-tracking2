@@ -1,6 +1,6 @@
+from datetime import timedelta
 from django.contrib import admin
 from tracking.models import Visitor
-from tracking import utils
 
 class VisitorAdmin(admin.ModelAdmin):
     date_hierarchy = 'start_time'
@@ -15,7 +15,8 @@ class VisitorAdmin(admin.ModelAdmin):
 
     def pretty_time_on_site(self, obj):
         if obj.time_on_site is not None:
-            return utils.pretty_timedelta(obj.time_on_site)
+            return timedelta(seconds=obj.time_on_site)
+    pretty_time_on_site.short_description = 'Time on site'
 
 
 admin.site.register(Visitor, VisitorAdmin)
