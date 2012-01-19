@@ -33,7 +33,7 @@ class Visitor(models.Model):
     def session_expired(self):
         "The session has ended due to session expiration"
         if self.expiry_time:
-            return not self.end_time and self.expiry_time <= datetime.now()
+            return self.expiry_time <= datetime.now()
         return False
     session_expired.boolean = True
 

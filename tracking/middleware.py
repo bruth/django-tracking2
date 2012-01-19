@@ -37,16 +37,8 @@ class VisitorTrackingMiddleware(object):
                 ip_address=get_ip_address(request),
                 user_agent=request.META['HTTP_USER_AGENT'])
 
-        # For sessions that expire at browser close, we do not have
-        # and expiration. Note that time on site calculations and will
-        # only exist for registered users who have explicitly logged out.
-        # Guests and registered users who leave their browsers open will
-        # not provide accurate stats.
-        if not request.session.get_expire_at_browser_close():
-            expiry_time = request.session.get_expiry_date()
-            expiry_age = request.session.get_expiry_age()
-            visitor.expiry_age = expiry_age
-            visitor.expiry_time = expiry_time
+        visitor.expiry_age = request.session.get_expiry_age()
+        visitor.expiry_time = request.session.get_expiry_date()
 
         # Be conservative with the determining time on site since simply
         # increasing the session timeout could greatly skew results. This
