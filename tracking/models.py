@@ -21,7 +21,7 @@ class Visitor(models.Model):
         null=True, editable=False)
     # Update to GenericIPAddress in Django 1.4
     ip_address = models.CharField(max_length=39, editable=False)
-    user_agent = models.TextField(editable=False)
+    user_agent = models.TextField(null=True, editable=False)
     start_time = models.DateTimeField(default=datetime.now, editable=False)
     expiry_age = models.IntegerField(null=True, editable=False)
     expiry_time = models.DateTimeField(null=True, editable=False)

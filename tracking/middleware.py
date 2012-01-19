@@ -34,7 +34,8 @@ class VisitorTrackingMiddleware(object):
             # Log the ip address. Start time is managed via the
             # field `default` value
             visitor = Visitor(session_key=session_key,
-                ip_address=get_ip_address(request))
+                ip_address=get_ip_address(request),
+                user_agent=request.META['HTTP_USER_AGENT'])
 
         # For sessions that expire at browser close, we do not have
         # and expiration. Note that time on site calculations and will
