@@ -51,6 +51,11 @@ MIDDLEWARE_CLASSES = (
 )
 ```
 
+Settings
+--------
+``TRACK_AJAX_REQUESTS`` - If True, AJAX requests will be tracked. Default
+is False
+
 Views
 -----
 To view aggregate data about all visitors and per-registered user stats,
