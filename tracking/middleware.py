@@ -1,13 +1,20 @@
 import logging
 from datetime import datetime
+from django.conf import settings
 from tracking.models import Visitor
 from tracking.utils import get_ip_address
+
+TRACK_AJAX_REQUESTS = getattr(settings, 'TRACK_AJAX_REQUESTS', False)
 
 log = logging.getLogger(__file__)
 
 class VisitorTrackingMiddleware(object):
     def process_response(self, request, response):
         if not hasattr(request, 'session'):
+            return response
+
+        # Do not track AJAX requests..
+        if request.is_ajax() and not TRACK_AJAX_REQUESTS:
             return response
 
         # If dealing with a non-authenticated user, we still should track the

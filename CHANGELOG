@@ -1,0 +1,7 @@
+2012-01-25  Byron Ruth  <b@devel.io>
+
+    * Add `TRACK_AJAX_REQUESTS` setting
+
+2012-01-18
+
+    * Initial release
