@@ -1,7 +1,12 @@
+2012-01-30  Byron Ruth  <b@devel.io>
+
+    * Fix bug where the 'User-Agent' header was assumed to
+    exist which caused an exception.
+
 2012-01-25  Byron Ruth  <b@devel.io>
 
     * Add `TRACK_AJAX_REQUESTS` setting
 
-2012-01-18
+2012-01-18  Byron Ruth  <b@devel.io>
 
     * Initial release

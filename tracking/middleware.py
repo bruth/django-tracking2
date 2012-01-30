@@ -42,7 +42,7 @@ class VisitorTrackingMiddleware(object):
             # field `default` value
             visitor = Visitor(session_key=session_key,
                 ip_address=get_ip_address(request),
-                user_agent=request.META['HTTP_USER_AGENT'])
+                user_agent=request.META.get('HTTP_USER_AGENT', None))
 
         visitor.expiry_age = request.session.get_expiry_age()
         visitor.expiry_time = request.session.get_expiry_date()
