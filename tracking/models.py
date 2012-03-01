@@ -8,7 +8,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_out
-from tracking.managers import VisitorManager
+from managers import VisitorManager
 
 USE_GEOIP = getattr(settings, 'TRACKING_USE_GEOIP', False)
 CACHE_TYPE = getattr(settings, 'GEOIP_CACHE_TYPE', 4)
@@ -58,6 +58,9 @@ class Visitor(models.Model):
 
         return self._geoip_data
 
+    def __unicode__(self):
+        return str(self.user)
+
     class Meta(object):
         ordering = ('-start_time',)
         permissions = (
@@ -65,5 +68,5 @@ class Visitor(models.Model):
         )
 
 
-from tracking import handlers
+import handlers
 user_logged_out.connect(handlers.track_ended_session)
