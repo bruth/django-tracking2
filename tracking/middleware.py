@@ -5,6 +5,7 @@ from tracking.models import Visitor
 from tracking.utils import get_ip_address
 
 TRACK_AJAX_REQUESTS = getattr(settings, 'TRACK_AJAX_REQUESTS', False)
+TRACK_ANONYMOUS_USERS = getattr(settings, 'TRACK_ANONYMOUS_USERS', True)
 
 log = logging.getLogger(__file__)
 
@@ -23,7 +24,11 @@ class VisitorTrackingMiddleware(object):
 
         user = getattr(request, 'user', None)
         # We cannot do anything with Anonymous users
-        if user and not user.is_authenticated():
+
+        if user.is_anonymous() and not TRACK_ANONYMOUS_USERS:
+            return response
+            
+        else:
             user = None
 
         # A Visitor row is unique by session_key
