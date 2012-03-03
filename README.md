@@ -56,6 +56,9 @@ Settings
 ``TRACK_AJAX_REQUESTS`` - If True, AJAX requests will be tracked. Default
 is False
 
+``TRACK_ANONYMOUS_USERS`` - If False, anonymous users will not be tracked.
+Default is True
+
 Views
 -----
 To view aggregate data about all visitors and per-registered user stats,

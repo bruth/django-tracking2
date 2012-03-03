@@ -5,11 +5,13 @@ from tracking.models import Visitor
 from tracking.utils import get_ip_address
 
 TRACK_AJAX_REQUESTS = getattr(settings, 'TRACK_AJAX_REQUESTS', False)
+TRACK_ANONYMOUS_USERS = getattr(settings, 'TRACK_ANONYMOUS_USERS', True)
 
 log = logging.getLogger(__file__)
 
 class VisitorTrackingMiddleware(object):
     def process_response(self, request, response):
+        # Session framework not installed, nothing to see here..
         if not hasattr(request, 'session'):
             return response
 
@@ -20,10 +22,12 @@ class VisitorTrackingMiddleware(object):
         # If dealing with a non-authenticated user, we still should track the
         # session since if authentication happens, the `session_key` carries
         # over, thus having a more accurate start time of session
-
         user = getattr(request, 'user', None)
-        # We cannot do anything with Anonymous users
-        if user and not user.is_authenticated():
+
+        # Check for anonymous users
+        if not user or user.is_anonymous():
+            if not TRACK_ANONYMOUS_USERS:
+                return response
             user = None
 
         # A Visitor row is unique by session_key
