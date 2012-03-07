@@ -59,6 +59,8 @@ is False
 ``TRACK_ANONYMOUS_USERS`` - If False, anonymous users will not be tracked.
 Default is True
 
+``TRACK_PAGEVIEWS`` - If True, individual pageviews will be tracked.
+
 Views
 -----
 To view aggregate data about all visitors and per-registered user stats,

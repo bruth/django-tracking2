@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from django.conf import settings
-from tracking.models import Visitor
+from tracking.models import Visitor, Pageview, TRACK_PAGEVIEWS
 from tracking.utils import get_ip_address
 
 TRACK_AJAX_REQUESTS = getattr(settings, 'TRACK_AJAX_REQUESTS', False)
@@ -54,11 +54,16 @@ class VisitorTrackingMiddleware(object):
         # Be conservative with the determining time on site since simply
         # increasing the session timeout could greatly skew results. This
         # is the only time we can guarantee.
+        now = datetime.now()
         time_on_site = 0
         if visitor.start_time:
-            time_on_site = (datetime.now() - visitor.start_time).seconds
+            time_on_site = (now - visitor.start_time).seconds
         visitor.time_on_site = time_on_site
 
         visitor.save()
+
+        if TRACK_PAGEVIEWS:
+            pageview = Pageview(visitor=visitor, url=request.path, view_time=now)
+            pageview.save()
 
         return response

@@ -51,7 +51,7 @@ class VisitorManager(models.Manager):
         if start_date:
             kwargs['start_time__gte'] = start_date
 
-        visits = {
+        visit_stats = {
             'total': 0,
             'unique': 0,
             'return_ratio': 0,
@@ -68,10 +68,10 @@ class VisitorManager(models.Manager):
         }
 
         visitors = self.get_query_set().filter(**kwargs)
-        visits['total'] = total_visits = visitors.count()
+        visit_stats['total'] = total_visits = visitors.count()
 
         if not total_visits:
-            return visits
+            return visit_stats
 
         # Registered user sessions
         registered_visitors = visitors.filter(user__isnull=False)
@@ -79,9 +79,9 @@ class VisitorManager(models.Manager):
 
         if registered_visits:
             unique_registered_visits = registered_visitors.values('user').distinct().count()
-            visits['unique'] += unique_registered_visits
+            visit_stats['unique'] += unique_registered_visits
 
-            visits['registered'] = {
+            visit_stats['registered'] = {
                 'total': registered_visits,
                 'unique': unique_registered_visits,
                 'return_ratio': float(registered_visits - unique_registered_visits) / registered_visits * 100
@@ -93,16 +93,27 @@ class VisitorManager(models.Manager):
 
             if guest_visits:
                 unique_guest_visits = guest_visitors.distinct().count()
-                visits['unique'] += unique_guest_visits
+                visit_stats['unique'] += unique_guest_visits
 
-                visits['guests'] = {
+                visit_stats['guests'] = {
                     'total': guest_visits,
                     'unique': unique_guest_visits,
                     'return_ratio': float(guest_visits - unique_guest_visits) / guest_visits * 100,
                 }
 
-        visits['return_ratio'] = float(visits['unique'] - visits['total']) / visits['total'] * 100
-        return visits
+        visit_stats['return_ratio'] = float(visit_stats['unique'] - visit_stats['total']) / visit_stats['total'] * 100
+
+        from tracking.models import TRACK_PAGEVIEWS
+        if TRACK_PAGEVIEWS:
+            visit_stats['pages_per_visit'] = visitors.annotate(page_count=Count('pageviews'))\
+                .aggregate(avg_pages=Avg('page_count'))['avg_pages']
+            visit_stats['registered']['pages_per_visit'] = registered_visitors\
+                .annotate(page_count=Count('pageviews')).aggregate(avg_pages=Avg('page_count'))['avg_pages']
+            if not registered_only:
+                visit_stats['guests']['pages_per_visit'] = guest_visitors\
+                    .annotate(page_count=Count('pageviews')).aggregate(avg_pages=Avg('page_count'))['avg_pages']
+
+        return visit_stats
 
     def user_stats(self, start_date=None, end_date=None):
         start_date, end_date = adjusted_date_range(start_date, end_date)
@@ -116,3 +127,69 @@ class VisitorManager(models.Manager):
 
         return User.objects.filter(**kwargs).annotate(visit_count=Count('visit_history'),
             time_on_site_avg=Avg('visit_history__time_on_site'))
+
+
+class PageviewManager(models.Manager):
+    def stats(self, start_date=None, end_date=None, registered_only=False):
+        """Returns a dictionary of pageviews including:
+
+            * total pageviews
+            * pages per visit
+
+        for all users, registered users and guests.
+        """
+        start_date, end_date = adjusted_date_range(start_date, end_date)
+
+        kwargs = {
+            'visitor__start_time__lt': end_date,
+        }
+        if start_date:
+            kwargs['visitor__start_time__gte'] = start_date
+
+        pageview_stats = {
+            'total': 0,
+            'unique': 0,
+            'registered': {
+                'total': 0,
+                'unique': 0,
+            },
+            'guests': {
+                'total': 0,
+                'unique': 0,
+            }
+        }
+
+        pageviews = self.get_query_set().filter(**kwargs)
+        pageview_stats['total'] = total_views = pageviews.count()
+
+        if not total_views:
+            return pageview_stats
+
+        # Registered user sessions
+        registered_pageviews = pageviews.filter(visitor__user__isnull=False)
+        registered_pageview_count = registered_pageviews.count()
+
+        if registered_pageview_count:
+            unique_registered_pageview_count = registered_pageviews.values('visitor__user').distinct().count()
+            pageview_stats['unique'] += unique_registered_pageview_count
+
+            pageview_stats['registered'] = {
+                'total': registered_pageview_count,
+                'unique': unique_registered_pageview_count,
+            }
+
+        if not registered_only:
+            guest_pageviews = pageviews.filter(user__isnull=True).values('ip_address', 'user_agent')
+            guest_pageview_count = guest_pageviews.count()
+
+            if guest_pageview_count:
+                unique_guest_pageview_count = guest_pageviews.distinct().count()
+                pageview_stats['unique'] += unique_guest_pageview_count
+
+                pageview_stats['guests'] = {
+                    'total': guest_pageview_count,
+                    'unique': unique_guest_pageview_count,
+                }
+
+        return pageview_stats
+

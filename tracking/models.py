@@ -8,8 +8,9 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_out
-from tracking.managers import VisitorManager
+from tracking.managers import VisitorManager, PageviewManager
 
+TRACK_PAGEVIEWS = getattr(settings, 'TRACK_PAGEVIEWS', False)
 USE_GEOIP = getattr(settings, 'TRACKING_USE_GEOIP', False)
 CACHE_TYPE = getattr(settings, 'GEOIP_CACHE_TYPE', 4)
 
@@ -63,6 +64,14 @@ class Visitor(models.Model):
         permissions = (
             ('view_visitor', 'Can view visitor'),
         )
+
+
+class Pageview(models.Model):
+    visitor = models.ForeignKey(Visitor, related_name='pageviews')
+    url = models.CharField(max_length=500)
+    view_time = models.DateTimeField()
+
+    objects = PageviewManager()
 
 
 from tracking import handlers
