@@ -1,9 +1,12 @@
+import re
 import logging
 from datetime import datetime
 from tracking.models import Visitor, Pageview
 from tracking.utils import get_ip_address
-from tracking.settings import (TRACK_PAGEVIEWS, TRACK_AJAX_REQUESTS,
-    TRACK_ANONYMOUS_USERS)
+from tracking.settings import (TRACK_AJAX_REQUESTS,
+    TRACK_ANONYMOUS_USERS, TRACK_PAGEVIEWS, TRACK_IGNORE_URLS)
+
+TRACK_IGNORE_URLS = map(lambda x: re.compile(x), TRACK_IGNORE_URLS)
 
 log = logging.getLogger(__file__)
 
@@ -61,7 +64,13 @@ class VisitorTrackingMiddleware(object):
         visitor.save()
 
         if TRACK_PAGEVIEWS:
-            pageview = Pageview(visitor=visitor, url=request.path, view_time=now)
-            pageview.save()
+            # Match against `path_info` to not include the SCRIPT_NAME..
+            path = request.path_info.lstrip('/')
+            for url in TRACK_IGNORE_URLS:
+                if url.match(path):
+                    break
+            else:
+                pageview = Pageview(visitor=visitor, url=request.path, view_time=now)
+                pageview.save()
 
         return response

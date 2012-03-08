@@ -53,13 +53,21 @@ MIDDLEWARE_CLASSES = (
 
 Settings
 --------
-``TRACK_AJAX_REQUESTS`` - If True, AJAX requests will be tracked. Default
+`TRACK_AJAX_REQUESTS` - If True, AJAX requests will be tracked. Default
 is False
 
-``TRACK_ANONYMOUS_USERS`` - If False, anonymous users will not be tracked.
+`TRACK_ANONYMOUS_USERS` - If False, anonymous users will not be tracked.
 Default is True
 
-``TRACK_PAGEVIEWS`` - If True, individual pageviews will be tracked.
+`TRACK_PAGEVIEWS` - If True, individual pageviews will be tracked.
+
+`TRACK_IGNORE_URLS` - A list of regular expressions that will be matched
+against the `request.path_info` (`request.path` is stored, but not matched
+against). If they are matched, the pageview record will not be saved. Default
+includes 'favicon.ico' and 'robots.txt'. Note, static and media are not included
+since they should be served up statically Django's static serve view or via
+a lightweight server in production. Read more
+[here](https://docs.djangoproject.com/en/dev/howto/static-files/#serving-other-directories)
 
 Views
 -----
