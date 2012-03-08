@@ -1,11 +1,9 @@
 import logging
 from datetime import datetime
-from django.conf import settings
-from tracking.models import Visitor, Pageview, TRACK_PAGEVIEWS
+from tracking.models import Visitor, Pageview
 from tracking.utils import get_ip_address
-
-TRACK_AJAX_REQUESTS = getattr(settings, 'TRACK_AJAX_REQUESTS', False)
-TRACK_ANONYMOUS_USERS = getattr(settings, 'TRACK_ANONYMOUS_USERS', True)
+from tracking.settings import (TRACK_PAGEVIEWS, TRACK_AJAX_REQUESTS,
+    TRACK_ANONYMOUS_USERS)
 
 log = logging.getLogger(__file__)
 

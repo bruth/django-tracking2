@@ -9,5 +9,12 @@
         </ul>
     {% endif %}
 
+    {% if warn_start_time %}
+        <p class=warning>The start date preceeds the oldest tracked visitor, thus
+        the stats are not complete for the specified date range.</p>
+    {% endif %}
+
     {% include "tracking/snippets/stats.html" %}                
+
+    <p>Tracking began on {{ track_start_time|date:"M d, Y @ g:i:s a" }}</p>
 {% endblock %}

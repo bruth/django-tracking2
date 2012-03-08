@@ -1,6 +1,7 @@
 from datetime import timedelta
 from django.contrib import admin
-from tracking.models import Visitor, Pageview, TRACK_PAGEVIEWS
+from tracking.models import Visitor, Pageview
+from tracking.settings import TRACK_PAGEVIEWS
 
 class VisitorAdmin(admin.ModelAdmin):
     date_hierarchy = 'start_time'

@@ -1,9 +1,11 @@
 import logging
 import calendar
 from datetime import date, timedelta
+from django.db.models import Min
 from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
-from tracking.models import Visitor
+from tracking.models import Visitor, Pageview
+from tracking.settings import TRACK_PAGEVIEWS
 
 log = logging.getLogger(__file__)
 
@@ -51,15 +53,26 @@ def stats(request):
     except (ValueError, TypeError):
         errors.append('<code>{0}</code> is not a valid end date'.format(end_str))
 
-    user_stats = list(Visitor.objects.user_stats(start_date, end_date).order_by('time_on_site_avg'))
-    for user in user_stats:
-        if user.time_on_site_avg is not None:
-            # Lop off the floating point
-            user.time_on_site_avg = timedelta(seconds=int(user.time_on_site_avg))
+    user_stats = list(Visitor.objects.user_stats(start_date, end_date))
 
-    return render(request, 'tracking/dashboard.html', {
+    track_start_time = Visitor.objects.order_by('start_time')[0].start_time
+    # If the start_date is later than when tracking began, no reason
+    # to warn about missing data
+    if start_date and calendar.timegm(start_date.timetuple()) < calendar.timegm(track_start_time.timetuple()):
+        warn_start_time = track_start_time
+    else:
+        warn_start_time = None
+
+    context = {
         'errors': errors,
+        'track_start_time': track_start_time,
+        'warn_start_time': warn_start_time,
         'visitor_stats': Visitor.objects.stats(start_date, end_date),
         'user_stats': user_stats,
         'tracked_dates': Visitor.objects.tracked_dates(),
-    })
+    }
+
+    if TRACK_PAGEVIEWS:
+        context['pageview_stats'] = Pageview.objects.stats(start_date, end_date)
+
+    return render(request, 'tracking/dashboard.html', context)

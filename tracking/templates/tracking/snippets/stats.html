@@ -7,6 +7,9 @@
             <th>Total</th>
             <th>Unique</th>
             <th>% Returning Visitor</th>
+            {% if pageview_stats %}
+                <th>Avg. Pages/Visit</th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -15,13 +18,31 @@
             <td>{{ visitor_stats.registered.total }}</td>
             <td>{{ visitor_stats.registered.unique }}</td>
             <td>{{ visitor_stats.registered.return_ratio|floatformat }}%</td>
+            {% if pageview_stats %}
+                <td>{{ visitor_stats.registered.pages_per_visit|floatformat|default:"n/a" }}</td>
+            {% endif %}
         </tr>
+
+        {% if visitor_stats.guests %}
         <tr>
             <th>Guests</th>
             <td>{{ visitor_stats.guests.total }}</td>
             <td>{{ visitor_stats.guests.unique }}</td>
             <td>{{ visitor_stats.guests.return_ratio|floatformat }}%</td>
+            {% if pageview_stats %}
+                <td>{{ visitor_stats.guests.pages_per_visit|floatformat|default:"n/a" }}</td>
+            {% endif %}
         </tr>
+        <tr>
+            <th>Total</th>
+            <td>{{ visitor_stats.total }}</td>
+            <td>{{ visitor_stats.unique }}</td>
+            <td>{{ visitor_stats.return_ratio|floatformat }}%</td>
+            {% if pageview_stats %}
+                <td>{{ visitor_stats.pages_per_visit|floatformat|default:"n/a" }}</td>
+            {% endif %}
+        </tr>
+        {% endif %}
     </tbody>
 </table>
 {% else %}
@@ -36,6 +57,7 @@
             <th></th>
             <th># Visits</th>
             <th>Avg. Time on Site</th>
+            <th>Avg. Pages/Visit</th>
         </tr>
     </thead>
     <tbody>
@@ -43,11 +65,48 @@
         <tr>
             <th>{% firstof user.get_full_name user %}</th>
             <td>{{ user.visit_count }}</td>
-            <td>{{ user.time_on_site_avg|default_if_none:"n/a" }}</td>
+            <td>{{ user.time_on_site|default_if_none:"n/a" }}</td>
+            <td>{{ user.pages_per_visit|floatformat|default:"n/a" }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 {% else %}
     <p>No registered user stats available</p>
+{% endif %}
+
+{% if pageview_stats %}
+<h2>Pageviews</h2>
+    {% if pageview_stats.total %}
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                <th>Total</th>
+                <th>Unique</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>Registered</th>
+                <td>{{ pageview_stats.registered.total }}</td>
+                <td>{{ pageview_stats.registered.unique }}</td>
+            </tr>
+            {% if pageview_stats.guests %}
+            <tr>
+                <th>Guests</th>
+                <td>{{ pageview_stats.guests.total }}</td>
+                <td>{{ pageview_stats.guests.unique }}</td>
+            </tr>
+            <tr>
+                <th>Total</th>
+                <td>{{ pageview_stats.total }}</td>
+                <td>{{ pageview_stats.unique }}</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No pageview stats available</p>
+    {% endif %}
 {% endif %}

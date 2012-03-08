@@ -9,10 +9,9 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_out
 from tracking.managers import VisitorManager, PageviewManager
+from tracking.settings import TRACK_USING_GEOIP
 
-TRACK_PAGEVIEWS = getattr(settings, 'TRACK_PAGEVIEWS', False)
-USE_GEOIP = getattr(settings, 'TRACKING_USE_GEOIP', False)
-CACHE_TYPE = getattr(settings, 'GEOIP_CACHE_TYPE', 4)
+GEOIP_CACHE_TYPE = getattr(settings, 'GEOIP_CACHE_TYPE', 4)
 
 log = logging.getLogger(__file__)
 
@@ -46,13 +45,13 @@ class Visitor(models.Model):
     @property
     def geoip_data(self):
         "Attempts to retrieve MaxMind GeoIP data based upon the visitor's IP"
-        if not HAS_GEOIP or not USE_GEOIP:
+        if not HAS_GEOIP or not TRACK_USING_GEOIP:
             return
 
         if not hasattr(self, '_geoip_data'):
             self._geoip_data = None
             try:
-                gip = GeoIP(cache=CACHE_TYPE)
+                gip = GeoIP(cache=GEOIP_CACHE_TYPE)
                 self._geoip_data = gip.city(self.ip_address)
             except GeoIPException:
                 log.error('Error getting GeoIP data for IP "%s": %s' % (self.ip_address, traceback.format_exc()))
@@ -72,6 +71,9 @@ class Pageview(models.Model):
     view_time = models.DateTimeField()
 
     objects = PageviewManager()
+
+    class Meta(object):
+        ordering = ('-view_time',)
 
 
 from tracking import handlers
