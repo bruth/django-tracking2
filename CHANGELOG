@@ -1,3 +1,9 @@
+2012-03-08  Byron Ruth  <b@devel.io>
+
+    * Add `TRACK_PAGEVIEWS` and `TRACK_IGNORE_URLS` settings.
+    * Deprecate `TRACKING_USE_GEOIP` in favor of `TRACK_USING_GEOIP`
+    (even though this is not an officially supported feature)
+
 2012-03-03  Byron Ruth  <b@devel.io>
 
     * Add `TRACK_ANONYMOUS_USERS` setting
