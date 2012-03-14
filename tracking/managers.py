@@ -3,6 +3,7 @@ from django.db import models
 from django.db.models import Count, Avg, Min, Max
 from django.contrib.auth.models import User
 from tracking.settings import TRACK_PAGEVIEWS, TRACK_ANONYMOUS_USERS
+from tracking.cache import CacheManager
 
 def adjusted_date_range(start=None, end=None):
     today = date.today()
@@ -12,7 +13,7 @@ def adjusted_date_range(start=None, end=None):
         end = today
     return start, end
 
-class VisitorManager(models.Manager):
+class VisitorManager(CacheManager):
     def active(self, registered_only=True):
         "Returns all active users, e.g. not logged and non-expired session."
         visitors = self.get_query_set().filter(expiry_time__gt=datetime.now(), end_time=None)

@@ -8,6 +8,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_out
+from django.db.models.signals import post_save, pre_delete
 from tracking.managers import VisitorManager, PageviewManager
 from tracking.settings import TRACK_USING_GEOIP
 
@@ -78,3 +79,4 @@ class Pageview(models.Model):
 
 from tracking import handlers
 user_logged_out.connect(handlers.track_ended_session)
+post_save.connect(handlers.post_save_cache, sender=Visitor)

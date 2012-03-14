@@ -1,3 +1,9 @@
+2012-03-14  Byron Ruth  <b@devel.io>
+
+    * Add internal cache mechanism to reduce database hits in middleware
+    by one. Cache invalidates after `SESSION_COOKIE_AGE` and when the user
+    explicitly logs out.
+
 2012-03-08  Byron Ruth  <b@devel.io>
 
     * Add `TRACK_PAGEVIEWS` and `TRACK_IGNORE_URLS` settings.
