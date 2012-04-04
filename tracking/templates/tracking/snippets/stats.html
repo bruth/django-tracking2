@@ -7,6 +7,7 @@
             <th>Total</th>
             <th>Unique</th>
             <th>% Returning Visitor</th>
+            <th>Avg. Time on Site</th>
             {% if pageview_stats %}
                 <th>Avg. Pages/Visit</th>
             {% endif %}
@@ -18,6 +19,7 @@
             <td>{{ visitor_stats.registered.total }}</td>
             <td>{{ visitor_stats.registered.unique }}</td>
             <td>{{ visitor_stats.registered.return_ratio|floatformat }}%</td>
+            <td>{{ visitor_stats.registered.time_on_site|default_if_none:"n/a" }}</td>
             {% if pageview_stats %}
                 <td>{{ visitor_stats.registered.pages_per_visit|floatformat|default:"n/a" }}</td>
             {% endif %}
@@ -29,6 +31,7 @@
             <td>{{ visitor_stats.guests.total }}</td>
             <td>{{ visitor_stats.guests.unique }}</td>
             <td>{{ visitor_stats.guests.return_ratio|floatformat }}%</td>
+            <td>{{ visitor_stats.guests.time_on_site|default_if_none:"n/a" }}</td>
             {% if pageview_stats %}
                 <td>{{ visitor_stats.guests.pages_per_visit|floatformat|default:"n/a" }}</td>
             {% endif %}
@@ -38,6 +41,7 @@
             <td>{{ visitor_stats.total }}</td>
             <td>{{ visitor_stats.unique }}</td>
             <td>{{ visitor_stats.return_ratio|floatformat }}%</td>
+            <td>{{ visitor_stats.time_on_site|default_if_none:"n/a" }}</td>
             {% if pageview_stats %}
                 <td>{{ visitor_stats.pages_per_visit|floatformat|default:"n/a" }}</td>
             {% endif %}

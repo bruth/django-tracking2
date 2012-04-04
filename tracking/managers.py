@@ -41,6 +41,7 @@ class VisitorManager(CacheManager):
             * unique visits
             * return ratio
             * pages per visit (if pageviews are enabled)
+            * time on site
 
         for all users, registered users and guests.
         """
@@ -65,12 +66,18 @@ class VisitorManager(CacheManager):
         if not total_count:
             return stats
 
+        # Avg time on site
+        total_time_on_site = visitors.aggregate(avg_tos=Avg('time_on_site'))['avg_tos']
+        stats['time_on_site'] = timedelta(seconds=int(total_time_on_site))
+
         # Registered user sessions
         registered_visitors = visitors.filter(user__isnull=False)
         registered_total_count = registered_visitors.count()
 
         if registered_total_count:
             registered_unique_count = registered_visitors.values('user').distinct().count()
+            # Avg time on site
+            registered_time_on_site = registered_visitors.aggregate(avg_tos=Avg('time_on_site'))['avg_tos']
 
             # Update the total unique count..
             unique_count += registered_unique_count
@@ -79,7 +86,8 @@ class VisitorManager(CacheManager):
             stats['registered'] = {
                 'total': registered_total_count,
                 'unique': registered_unique_count,
-                'return_ratio': float(registered_total_count - registered_unique_count) / registered_total_count * 100
+                'return_ratio': float(registered_total_count - registered_unique_count) / registered_total_count * 100,
+                'time_on_site': timedelta(seconds=int(registered_time_on_site)),
             }
 
         # Get stats for our guests..
@@ -89,6 +97,8 @@ class VisitorManager(CacheManager):
 
             if guest_total_count:
                 guest_unique_count = guest_visitors.values('ip_address').distinct().count()
+                # Avg time on site
+                guest_time_on_site = guest_visitors.aggregate(avg_tos=Avg('time_on_site'))['avg_tos']
 
                 # Update the total unique count...
                 unique_count += guest_unique_count
@@ -97,6 +107,7 @@ class VisitorManager(CacheManager):
                     'total': guest_total_count,
                     'unique': guest_unique_count,
                     'return_ratio': float(guest_total_count - guest_unique_count) / guest_total_count * 100,
+                    'time_on_site': timedelta(seconds=int(guest_time_on_site)),
                 }
 
         # Finish setting the total visitor counts
