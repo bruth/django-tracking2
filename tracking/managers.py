@@ -136,23 +136,29 @@ class VisitorManager(CacheManager):
 
     def user_stats(self, start_date=None, end_date=None):
         start_date, end_date = adjusted_date_range(start_date, end_date)
-        kwargs = {
+        user_kwargs = {
             'visit_history__start_time__lt': end_date,
         }
+        visit_kwargs = {
+            'start_time__lt': end_date,
+        }
         if start_date:
-            kwargs['visit_history__start_time__gte'] = start_date
+            user_kwargs['visit_history__start_time__gte'] = start_date
+            visit_kwargs['start_time__gte'] = start_date
         else:
-            kwargs['visit_history__start_time__isnull'] = False
+            user_kwargs['visit_history__start_time__isnull'] = False
+            visit_kwargs['start_time__isnull'] = False
 
-        users = list(User.objects.annotate(
+        users = list(User.objects.filter(**user_kwargs).annotate(
             visit_count=Count('visit_history'),
             time_on_site=Avg('visit_history__time_on_site'),
         ).filter(visit_count__gt=0, **kwargs).order_by('-time_on_site'))
 
         # Aggregate pageviews per visit
         for user in users:
-            user.pages_per_visit = user.visit_history.annotate(page_count=Count('pageviews'))\
-                .filter(page_count__gt=0).aggregate(pages_per_visit=Avg('page_count'))['pages_per_visit']
+            user.pages_per_visit = user.visit_history.filter(**visit_kwargs)\
+                .annotate(page_count=Count('pageviews')).filter(page_count__gt=0)\
+                .aggregate(pages_per_visit=Avg('page_count'))['pages_per_visit']
             # Lop off the floating point, turn into timedelta
             user.time_on_site = timedelta(seconds=int(user.time_on_site))
         return users
