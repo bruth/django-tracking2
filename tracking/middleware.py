@@ -31,6 +31,10 @@ class VisitorTrackingMiddleware(object):
                 return response
             user = None
 
+        # Force a save to generate a session key if one does not exist
+        if not request.session.session_key:
+            request.session.save()
+
         # A Visitor row is unique by session_key
         session_key = request.session.session_key
 
