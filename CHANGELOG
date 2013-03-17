@@ -1,3 +1,7 @@
+2013-03-16  Byron Ruth  <b@devel.io>
+
+    * Fix offset-aware and offset-naive datetime errors by Chris Franklin
+
 2012-03-14  Byron Ruth  <b@devel.io>
 
     * Add internal cache mechanism to reduce database hits in middleware
