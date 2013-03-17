@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta
+from django.utils import timezone
 from django.db import models
 from django.db.models import Count, Avg, Min, Max
 from django.contrib.auth.models import User
@@ -16,7 +17,7 @@ def adjusted_date_range(start=None, end=None):
 class VisitorManager(CacheManager):
     def active(self, registered_only=True):
         "Returns all active users, e.g. not logged and non-expired session."
-        visitors = self.get_query_set().filter(expiry_time__gt=datetime.now(), end_time=None)
+        visitors = self.get_query_set().filter(expiry_time__gt=timezone.now(), end_time=None)
         if registered_only:
             visitors = visitors.filter(user__isnull=False)
         return visitors
