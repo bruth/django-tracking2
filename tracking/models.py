@@ -1,6 +1,7 @@
 import logging
 import traceback
 from datetime import datetime
+from django.utils import timezone
 from django.contrib.gis.utils import HAS_GEOIP
 if HAS_GEOIP:
     from django.contrib.gis.utils import GeoIP, GeoIPException
@@ -23,7 +24,7 @@ class Visitor(models.Model):
     # Update to GenericIPAddress in Django 1.4
     ip_address = models.CharField(max_length=39, editable=False)
     user_agent = models.TextField(null=True, editable=False)
-    start_time = models.DateTimeField(default=datetime.now, editable=False)
+    start_time = models.DateTimeField(default=timezone.now, editable=False)
     expiry_age = models.IntegerField(null=True, editable=False)
     expiry_time = models.DateTimeField(null=True, editable=False)
     time_on_site = models.IntegerField(null=True, editable=False)
@@ -34,7 +35,7 @@ class Visitor(models.Model):
     def session_expired(self):
         "The session has ended due to session expiration"
         if self.expiry_time:
-            return self.expiry_time <= datetime.now()
+            return self.expiry_time <= timezone.now()
         return False
     session_expired.boolean = True
 

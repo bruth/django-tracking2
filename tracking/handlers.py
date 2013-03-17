@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.utils import timezone
 from django.core.cache import cache
 from django.conf import settings
 from tracking.models import Visitor
@@ -14,7 +15,7 @@ def track_ended_session(sender, request, user, **kwargs):
         return
 
     # Explicitly end this session. This improves the accuracy of the stats.
-    visitor.end_time = datetime.now()
+    visitor.end_time = timezone.now()
     visitor.time_on_site = (visitor.end_time - visitor.start_time).seconds
     visitor.save()
 
