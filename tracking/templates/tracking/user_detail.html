@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>{{ user_name }} Page Views</h2>
+
+<div class="tracking-breadcrumb">
+  <a href="{% url 'tracking-dashboard' %}">Dashboard</a> &gt;
+  {{ user_name }}'s page views
+</div>
+
+{% include "tracking/snippets/pagination_links.html" %}
+
+<table>
+  <thead>
+    <tr>
+      <th>URL</th>
+      <th>Time</th>
+      <th>IP</th>
+      <th>Agent</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for pv in pageviews %}
+    <tr>
+      <td>{{ pv.url }}</td>
+      <td>{{ pv.view_time }}</td>
+      <td>{{ pv.visitor.ip_address }}</td>
+      <td>{{ pv.visitor.user_agent }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% include "tracking/snippets/pagination_links.html" %}
+
+{% endblock %}

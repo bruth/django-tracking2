@@ -1,0 +1,12 @@
+<div class="tracking-pagenumsnav">
+{% for p in page_links %}
+  {% if p.url %}
+    <a href='{{ p.url }}'>{{ p.text }}</a>
+  {% elif p.strong %}
+    <strong>{{ p.text }}</strong>
+  {% else %}
+    {{ p.text }}
+  {% endif %}
+{% endfor %}
+&nbsp; &nbsp; {{ pageviews.paginator.count }} page views
+</div>

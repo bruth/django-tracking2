@@ -67,7 +67,8 @@
     <tbody>
         {% for user in user_stats %}
         <tr>
-            <th>{% firstof user.get_full_name user %}</th>
+            <th><a href='{% url 'tracking-user-detail' user.pk %}'
+                   >{% firstof user.get_full_name user %}</a></th>
             <td>{{ user.visit_count }}</td>
             <td>{{ user.time_on_site|default_if_none:"n/a" }}</td>
             <td>{{ user.pages_per_visit|floatformat|default:"n/a" }}</td>
