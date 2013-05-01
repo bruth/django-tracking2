@@ -17,7 +17,11 @@
       <th>URL</th>
       <th>Time</th>
       <th>IP</th>
+      {% if platform %}
+      <th>Platform</th>
+      {% else %}
       <th>Agent</th>
+      {% endif %}
     </tr>
   </thead>
   <tbody>
@@ -25,8 +29,16 @@
     <tr>
       <td>{{ pv.url }}</td>
       <td>{{ pv.view_time }}</td>
-      <td>{{ pv.visitor.ip_address }}</td>
+      <td>
+        {{ pv.visitor.ip_address }}
+        {{ pv.visitor.geoip_data.city }}
+        {{ pv.visitor.geoip_data.country_name }}
+      </td>
+      {% if platform %}
+      <td>{{ pv.platform }}</td>
+      {% else %}
       <td>{{ pv.visitor.user_agent }}</td>
+      {% endif %}
     </tr>
     {% endfor %}
   </tbody>
