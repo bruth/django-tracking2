@@ -11,7 +11,15 @@ from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_out
 from django.db.models.signals import post_save, pre_delete
 from tracking.managers import VisitorManager, PageviewManager
-from tracking.settings import TRACK_USING_GEOIP
+from tracking.settings import TRACK_USING_GEOIP, TRACK_PARSE_AGENT
+
+try:
+    user_agents = None
+    if TRACK_PARSE_AGENT:
+        # https://github.com/selwin/python-user-agents
+        import user_agents
+except ImportError:
+    pass
 
 GEOIP_CACHE_TYPE = getattr(settings, 'GEOIP_CACHE_TYPE', 4)
 
@@ -59,6 +67,28 @@ class Visitor(models.Model):
                 log.error('Error getting GeoIP data for IP "%s": %s' % (self.ip_address, traceback.format_exc()))
 
         return self._geoip_data
+
+    @property
+    def platform(self):
+        """
+        Returns string describing browser platform. Falls back to agent
+        string if either user_agents module not found, or
+        TRACK_PARSE_AGENT is False
+        """
+        if not user_agents:
+            return self.user_agent
+
+        if not hasattr(self, '_platform_string'):
+            platform = user_agents.parse(self.user_agent)
+            self._platform_string = ("%s %d %s %s " %
+                                     (platform.browser.family,
+                                      platform.browser.version[0],
+                                      platform.os.family,
+                                      platform.os.version_string))
+            if platform.device.family:
+                self._platform_string += platform.device.family
+
+        return self._platform_string
 
     class Meta(object):
         ordering = ('-start_time',)

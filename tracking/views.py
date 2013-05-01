@@ -11,11 +11,6 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage
 from django.core.urlresolvers import reverse
 
-try:
-    import user_agents
-except ImportError:
-    user_agents = None
-
 log = logging.getLogger(__file__)
 
 def parse_partial_date(date_str, upper=False):
@@ -165,20 +160,10 @@ def user_detail(request, uid):
     else:
         name = str(user)
 
-    if user_agents:
-        for pv in pageviews:
-            platform = user_agents.parse(pv.visitor.user_agent)
-            pv.platform = "%s %d %s %s " % (platform.browser.family,
-                                           platform.browser.version[0],
-                                           platform.os.family,
-                                           platform.os.version_string)
-            if platform.device.family:
-                pv.platform += platform.device.family
     context = {
         'user': user,
         'user_name': name,
         'pageviews': page,
         'page_links': page_links,
-        'platform': bool(user_agents),
     }
     return render(request, 'tracking/user_detail.html', context)
