@@ -10,6 +10,8 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage
 from django.core.urlresolvers import reverse
+from django.views.generic import ListView
+import pprint #????
 
 log = logging.getLogger(__file__)
 
@@ -167,3 +169,42 @@ def user_detail(request, uid):
         'page_links': page_links,
     }
     return render(request, 'tracking/user_detail.html', context)
+
+class PageLinksMixin(object):
+
+    def get_context_data(self, **kwargs):
+        ctx = super(ListView, self).get_context_data(**kwargs)
+        print "\nPageLinksMixin"
+        pprint.pprint(ctx)
+        return ctx
+
+class UserVisits(PageLinksMixin, ListView):
+
+    template_name = "tracking/user_visits.html"
+    paginate_by = 50
+
+    def get_queryset(self):
+        self.user = get_object_or_404(User, pk=self.args[0])
+        return Visitor.objects.filter(user=self.user)
+
+    def get_context_data(self, **kwargs):
+        ctx = super(UserVisits, self).get_context_data(**kwargs)
+        print "\nUserVisits"
+        pprint.pprint(ctx)
+        if self.user.get_full_name():
+            name = self.user.get_full_name()
+        elif self.user.email:
+            name = self.user.email
+        else:
+            name = str(self.user)
+        ctx['user_name'] = name
+        return ctx
+
+# @permission_required('tracking.view_visitor')
+# def user_visits(request, uid):
+#     """
+#     Shows table of visits for a particular user, in reverse datetime
+#     """
+#     user = get_object_or_404(User, pk=uid)
+#     visits = 
+
