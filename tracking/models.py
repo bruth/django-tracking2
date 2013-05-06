@@ -2,9 +2,9 @@ import logging
 import traceback
 from datetime import datetime
 from django.utils import timezone
-from django.contrib.gis.utils import HAS_GEOIP
+from django.contrib.gis.geoip import HAS_GEOIP
 if HAS_GEOIP:
-    from django.contrib.gis.utils import GeoIP, GeoIPException
+    from django.contrib.gis.geoip import GeoIP, GeoIPException
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
