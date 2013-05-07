@@ -1,3 +1,4 @@
+{% if page_links %}
 <div class="tracking-pagenumsnav">
 {% for p in page_links %}
   {% if p.url %}
@@ -8,5 +9,6 @@
     {{ p.text }}
   {% endif %}
 {% endfor %}
-&nbsp; &nbsp; {{ pageviews.paginator.count }} page views
+&nbsp; &nbsp; {{ paginator.count }} {{ model_name_plural }}
 </div>
+{% endif %}

@@ -1,6 +1,6 @@
 import logging
 import traceback
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.utils import timezone
 from django.contrib.gis.utils import HAS_GEOIP
 if HAS_GEOIP:
@@ -51,6 +51,11 @@ class Visitor(models.Model):
         "The session has ended due to an explicit logout"
         return bool(self.end_time)
     session_ended.boolean = True
+
+    @property
+    def last_time(self):
+        "datetime of last time visited - start_time + time_on_site"
+        return self.start_time + timedelta(seconds=self.time_on_site)
 
     @property
     def geoip_data(self):

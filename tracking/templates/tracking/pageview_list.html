@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>{{ user_name }} Visit</h2>
+
+<div class="tracking-breadcrumb">
+  <a href="{% url 'tracking-dashboard' %}">Dashboard</a> &gt;
+  {% if user_name %}
+  <a href="{% url 'tracking-user-visits' visitor.user.pk %}">
+    {{ user_name }}'s visits
+  </a> &gt;
+  {% endif %}
+  Page views
+</div>
+
+<table class="tracking-visit">
+  <tr>
+    <th>IP Address</th>
+    <td>
+      {{ visitor.ip_address }}
+      {{ visitor.geoip_data.city }}
+      {{ visitor.geoip_data.country_name }}
+    </td>
+  </tr>
+  <tr>
+    <th>Start time</th>
+    <td>{{ visitor.start_time }}</td>
+  </tr>
+  <tr>
+    <th>Time on site</th>
+    <td>{{ visitor.start_time|timesince:visitor.last_time }}</td>
+  </tr>
+  <tr>
+    <th>Platform</th>
+    <td>{{ visitor.platform }}</td>
+  </tr>
+  <tr>
+    <th>Num Page Views</th>
+    <td>{{ paginator.count }}</td>
+  </tr>
+</table>
+
+{% include "tracking/snippets/pagination_links.html" %}
+
+<table class="tracking-list tracking-pageviews">
+  <thead>
+    <tr>
+      <th>URL</th>
+      <th>Time</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for v in object_list %}
+    <tr>
+      <td>{{ v.url }}</td>
+      <td>{{ v.view_time }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% include "tracking/snippets/pagination_links.html" %}
+
+{% endblock %}

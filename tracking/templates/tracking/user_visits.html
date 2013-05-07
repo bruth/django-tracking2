@@ -9,11 +9,13 @@
   {{ user_name }}'s visits
 </div>
 
-<table>
+{% include "tracking/snippets/pagination_links.html" %}
+
+<table class="tracking-list tracking-user-visits">
   <thead>
     <tr>
       <th>Start time</th>
-      <th>IP</th>
+      <th>IP Address</th>
       <th>Time on site</th>
       <th>Platform</th>
     </tr>
@@ -21,17 +23,19 @@
   <tbody>
     {% for v in object_list %}
     <tr>
-      <td>{{ v.start_time }}</td>
+      <td><a href='{% url 'tracking-pageviews' v.pk %}'>{{ v.start_time }}</a></td>
       <td>
         {{ v.ip_address }}
         {{ v.geoip_data.city }}
         {{ v.geoip_data.country_name }}
       </td>
-      <td>{{ v.time_on_site }}</td>
+      <td>{{ v.start_time|timesince:v.last_time }}</td>
       <td>{{ v.platform }}</td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
+
+{% include "tracking/snippets/pagination_links.html" %}
 
 {% endblock %}
