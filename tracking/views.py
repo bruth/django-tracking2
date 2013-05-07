@@ -1,9 +1,11 @@
 import logging
 import calendar
+from datetime import datetime, time
 from datetime import date, timedelta
 from django.db.models import Min
 from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
+from django.utils.timezone import now
 from tracking.models import Visitor, Pageview
 from tracking.settings import TRACK_PAGEVIEWS
 
@@ -62,7 +64,6 @@ def stats(request):
         warn_start_time = track_start_time
     else:
         warn_start_time = None
-
     context = {
         'errors': errors,
         'track_start_time': track_start_time,
@@ -74,5 +75,13 @@ def stats(request):
 
     if TRACK_PAGEVIEWS:
         context['pageview_stats'] = Pageview.objects.stats(start_date, end_date)
+    if not end_date:
+        context['end_date'] = now()
+    else:
+        context['end_date'] = end_date
+    if not start_date:
+        context['start_date'] = track_start_time
+    else:
+        context['start_date'] = datetime.combine(start_date, time.min)
 
     return render(request, 'tracking/dashboard.html', context)
