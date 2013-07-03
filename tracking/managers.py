@@ -117,9 +117,10 @@ class VisitorManager(CacheManager):
 
         # If pageviews are being tracked, add the aggregated pages-per-visit stat
         if TRACK_PAGEVIEWS:
-            stats['registered']['pages_per_visit'] = registered_visitors\
-                .annotate(page_count=Count('pageviews')).filter(page_count__gt=0)\
-                .aggregate(pages_per_visit=Avg('page_count'))['pages_per_visit']
+            if 'registered' in stats:
+                stats['registered']['pages_per_visit'] = registered_visitors\
+                    .annotate(page_count=Count('pageviews')).filter(page_count__gt=0)\
+                    .aggregate(pages_per_visit=Avg('page_count'))['pages_per_visit']
 
             if TRACK_ANONYMOUS_USERS and not registered_only:
                 stats['guests']['pages_per_visit'] = guest_visitors\
@@ -129,7 +130,10 @@ class VisitorManager(CacheManager):
                 total_per_visit = visitors.annotate(page_count=Count('pageviews'))\
                     .filter(page_count__gt=0).aggregate(pages_per_visit=Avg('page_count'))['pages_per_visit']
             else:
-                total_per_visit = stats['registered']['pages_per_visit']
+                if 'registered' in stats:
+                    total_per_visit = stats['registered']['pages_per_visit']
+                else:
+                    total_per_visit = 0
 
             stats['pages_per_visit'] = total_per_visit
 
