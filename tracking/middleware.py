@@ -41,17 +41,18 @@ class VisitorTrackingMiddleware(object):
 
         try:
             visitor = Visitor.objects.get(pk=session_key)
-            # Update the user field if the visitor user is not set. This
-            # implies authentication has occured on this request and now
-            # the user is object exists. Check using `user_id` to prevent
-            # a database hit.
-            if user and not visitor.user_id:
-                visitor.user = user
         except Visitor.DoesNotExist:
             # Log the ip address. Start time is managed via the
             # field `default` value
             visitor = Visitor(pk=session_key, ip_address=get_ip_address(request),
                 user_agent=request.META.get('HTTP_USER_AGENT', None))
+
+        # Update the user field if the visitor user is not set. This
+        # implies authentication has occured on this request and now
+        # the user is object exists. Check using `user_id` to prevent
+        # a database hit.
+        if user and not visitor.user_id:
+            visitor.user = user
 
         visitor.expiry_age = request.session.get_expiry_age()
         visitor.expiry_time = request.session.get_expiry_date()
