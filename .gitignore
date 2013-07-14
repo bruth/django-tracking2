@@ -1,5 +1,7 @@
-*.swp
-*.pyc
+*.sw?
+*.py?
+*~
+*.egg-info
 .DS_Store
 dist
 MANIFEST
