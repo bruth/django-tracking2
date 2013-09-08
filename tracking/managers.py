@@ -2,9 +2,9 @@ from datetime import date, datetime, timedelta
 from django.utils import timezone
 from django.db import models
 from django.db.models import Count, Avg, Min, Max
-from django.contrib.auth.models import User
 from tracking.settings import TRACK_PAGEVIEWS, TRACK_ANONYMOUS_USERS
 from tracking.cache import CacheManager
+from .compat import User
 
 def adjusted_date_range(start=None, end=None):
     today = date.today()

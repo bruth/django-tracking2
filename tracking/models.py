@@ -7,11 +7,11 @@ if HAS_GEOIP:
     from django.contrib.gis.geoip import GeoIP, GeoIPException
 from django.db import models
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_out
 from django.db.models.signals import post_save, pre_delete
 from tracking.managers import VisitorManager, PageviewManager
 from tracking.settings import TRACK_USING_GEOIP
+from .compat import User
 
 GEOIP_CACHE_TYPE = getattr(settings, 'GEOIP_CACHE_TYPE', 4)
 
