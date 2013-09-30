@@ -1,5 +1,6 @@
 import logging
 import calendar
+from warnings import warn
 from datetime import datetime, time
 from datetime import date, timedelta
 from django.db.models import Min
@@ -38,7 +39,7 @@ def parse_partial_date(date_str, upper=False):
 
 
 @permission_required('tracking.view_visitor')
-def stats(request):
+def dashboard(request):
     "Counts, aggregations and more!"
     errors = []
     start_date, end_date = None, None
@@ -85,3 +86,8 @@ def stats(request):
         context['start_date'] = datetime.combine(start_date, time.min)
 
     return render(request, 'tracking/dashboard.html', context)
+
+
+def stats(*args, **kwargs):
+    warn('The stats view has been renamed to dashboard and the /dashboard/ URL has be moved to the root /', DeprecationWarning)
+    return dashboard(*args, **kwargs)
