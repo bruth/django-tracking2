@@ -4,6 +4,9 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+from tracking.compat import User
+
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
@@ -11,7 +14,7 @@ class Migration(SchemaMigration):
         # Adding model 'Visitor'
         db.create_table('tracking_visitor', (
             ('session_key', self.gf('django.db.models.fields.CharField')(max_length=40, primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='visit_history', null=True, to=orm['auth.User'])),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='visit_history', null=True, to=User)),
             ('ip_address', self.gf('django.db.models.fields.CharField')(max_length=39)),
             ('user_agent', self.gf('django.db.models.fields.TextField')()),
             ('start_time', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
