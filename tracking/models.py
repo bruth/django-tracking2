@@ -29,7 +29,7 @@ class Visitor(models.Model):
     expiry_time = models.DateTimeField(null=True, editable=False)
     time_on_site = models.IntegerField(null=True, editable=False)
     end_time = models.DateTimeField(null=True, editable=False)
-
+    is_mobile = models.BooleanField(null = True, blank = True)
     objects = VisitorManager()
 
     def session_expired(self):
