@@ -75,7 +75,8 @@ class VisitorTrackingMiddleware(object):
                 if url.match(path):
                     break
             else:
-                pageview = Pageview(visitor=visitor, url=request.path, view_time=now)
+                pageview = Pageview(visitor=visitor, url=request.path,
+                    view_time=now, method=request.method)
                 pageview.save()
 
         return response
