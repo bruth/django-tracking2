@@ -10,50 +10,31 @@ from tracking.settings import (TRACK_AJAX_REQUESTS,
 TRACK_IGNORE_URLS = map(lambda x: re.compile(x), TRACK_IGNORE_URLS)
 
 log = logging.getLogger(__file__)
+pattern = "(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|windows ce|pda|mobile|mini|palm|netfront|mobi|avantgo|bolt|android|ipad|pock
+et|lynx|links|tablet|armv5|armv6|armv7)"
+prog = re.compile(pattern, re.IGNORECASE)
+wap_pattern = "application/vnd\.wap\.xhtml\+xml"
+wap_prog = re.compile(pattern, re.IGNORECASE)
 
 class VisitorTrackingMiddleware(object):
     def is_mobile_bowser(self, request):
         """
-        @note: You can check the mobile user agents detected by this in MobileAgents.txt
+        Method to detect if the request is from a mobile browser or not.
         """
         is_mobile = False
-
         if request.META.has_key('HTTP_USER_AGENT'):
             user_agent = request.META['HTTP_USER_AGENT']
-
-            # Test common mobile values.
-            """
-            @change: patterns added for mobile detection is avantgo|bolt|android|ipad|pocket|lynx|links|tablet|armv5|armv6|armv7
-            @since: 02-04-2012
-            """
-            pattern = "(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|windows ce|pda|mobile|mini|palm|netfront|mobi|avantgo|bolt|android|ipad|pock
-et|lynx|links|tablet|armv5|armv6|armv7)"
-            prog = re.compile(pattern, re.IGNORECASE)
             match = prog.search(user_agent)
-
             if match:
                 is_mobile = True
             else:
-                # Nokia like test for WAP browsers.
-                # http://www.developershome.com/wap/xhtmlmp/xhtml_mp_tutorial.asp?page=mimeTypesFileExtension
-
-                if request.META.has_key('HTTP_ACCEPT'):
+                if 'HTTP_ACCEPT' in request.META:
                     http_accept = request.META['HTTP_ACCEPT']
-
-                    pattern = "application/vnd\.wap\.xhtml\+xml"
-                    prog = re.compile(pattern, re.IGNORECASE)
-
-                    match = prog.search(http_accept)
-
+                    match = wap_prog.search(http_accept)
                     if match:
                         is_mobile = True
-
             if not is_mobile:
                 # Now we test the user_agent from a big list.
-                """
-                @change: To user_agents_test "htc_" is added
-                @since: 02-04-2012
-                """
                 user_agents_test = ("w3c ", "acs-", "alav", "alca", "amoi", "audi",
                                     "avan", "benq", "bird", "blac", "blaz", "brew",
                                     "cell", "cldc", "cmd-", "dang", "doco", "eric",
@@ -73,7 +54,6 @@ et|lynx|links|tablet|armv5|armv6|armv7)"
                 test = user_agent[0:4].lower()
                 if test in user_agents_test:
                     is_mobile = True
-
         return is_mobile
     def process_response(self, request, response):
         # Session framework not installed, nothing to see here..
@@ -108,7 +88,7 @@ et|lynx|links|tablet|armv5|armv6|armv7)"
             # Log the ip address. Start time is managed via the
             # field `default` value
             visitor = Visitor(pk=session_key, ip_address=get_ip_address(request),
-                user_agent=request.META.get('HTTP_USER_AGENT', None), is_mobile = is_mobile_bowser(request))
+                user_agent=request.META.get('HTTP_USER_AGENT', None), is_mobile=self.is_mobile_bowser(request))
 
         # Update the user field if the visitor user is not set. This
         # implies authentication has occured on this request and now
