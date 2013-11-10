@@ -2,16 +2,16 @@ import logging
 import traceback
 from datetime import datetime, timedelta
 from django.utils import timezone
-from django.contrib.gis.utils import HAS_GEOIP
+from django.contrib.gis.geoip import HAS_GEOIP
 if HAS_GEOIP:
     from django.contrib.gis.geoip import GeoIP, GeoIPException
 from django.db import models
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_out
 from django.db.models.signals import post_save, pre_delete
 from tracking.managers import VisitorManager, PageviewManager
 from tracking.settings import TRACK_USING_GEOIP, TRACK_PARSE_AGENT
+from .compat import User
 
 try:
     user_agents = None
@@ -105,6 +105,7 @@ class Visitor(models.Model):
 class Pageview(models.Model):
     visitor = models.ForeignKey(Visitor, related_name='pageviews')
     url = models.CharField(max_length=500)
+    method = models.CharField(max_length=20, null=True)
     view_time = models.DateTimeField()
 
     objects = PageviewManager()

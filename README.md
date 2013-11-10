@@ -1,5 +1,8 @@
 Overview
 ========
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/bruth/django-tracking2/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
 django-tracking2 tracks the length of time visitors and registered users
 spend on your site. Although this will work for websites, this is more
 applicable to web _applications_ with registered users. This does

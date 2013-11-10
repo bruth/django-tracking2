@@ -2,9 +2,9 @@ from datetime import date, datetime, timedelta
 from django.utils import timezone
 from django.db import models
 from django.db.models import Count, Avg, Min, Max
-from django.contrib.auth.models import User
 from tracking.settings import TRACK_PAGEVIEWS, TRACK_ANONYMOUS_USERS
 from tracking.cache import CacheManager
+from .compat import User
 
 def adjusted_date_range(start=None, end=None):
     today = date.today()
@@ -117,9 +117,10 @@ class VisitorManager(CacheManager):
 
         # If pageviews are being tracked, add the aggregated pages-per-visit stat
         if TRACK_PAGEVIEWS:
-            stats['registered']['pages_per_visit'] = registered_visitors\
-                .annotate(page_count=Count('pageviews')).filter(page_count__gt=0)\
-                .aggregate(pages_per_visit=Avg('page_count'))['pages_per_visit']
+            if 'registered' in stats:
+                stats['registered']['pages_per_visit'] = registered_visitors\
+                    .annotate(page_count=Count('pageviews')).filter(page_count__gt=0)\
+                    .aggregate(pages_per_visit=Avg('page_count'))['pages_per_visit']
 
             if TRACK_ANONYMOUS_USERS and not registered_only:
                 stats['guests']['pages_per_visit'] = guest_visitors\
@@ -129,7 +130,10 @@ class VisitorManager(CacheManager):
                 total_per_visit = visitors.annotate(page_count=Count('pageviews'))\
                     .filter(page_count__gt=0).aggregate(pages_per_visit=Avg('page_count'))['pages_per_visit']
             else:
-                total_per_visit = stats['registered']['pages_per_visit']
+                if 'registered' in stats:
+                    total_per_visit = stats['registered']['pages_per_visit']
+                else:
+                    total_per_visit = 0
 
             stats['pages_per_visit'] = total_per_visit
 
