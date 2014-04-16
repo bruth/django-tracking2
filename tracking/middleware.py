@@ -5,7 +5,7 @@ from django.utils import timezone
 from tracking.models import Visitor, Pageview
 from tracking.utils import get_ip_address
 from tracking.settings import (TRACK_AJAX_REQUESTS,
-    TRACK_ANONYMOUS_USERS, TRACK_PAGEVIEWS, TRACK_IGNORE_URLS)
+    TRACK_ANONYMOUS_USERS, TRACK_PAGEVIEWS, TRACK_IGNORE_URLS, TRACK_IGNORE_STATUS_CODES)
 
 TRACK_IGNORE_URLS = map(lambda x: re.compile(x), TRACK_IGNORE_URLS)
 
@@ -19,6 +19,10 @@ class VisitorTrackingMiddleware(object):
 
         # Do not track AJAX requests..
         if request.is_ajax() and not TRACK_AJAX_REQUESTS:
+            return response
+
+        # Do not track if HTTP HttpResponse status_code blacklisted
+        if response.status_code in TRACK_IGNORE_STATUS_CODES:
             return response
 
         # If dealing with a non-authenticated user, we still should track the
