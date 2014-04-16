@@ -72,6 +72,14 @@ since they should be served up statically Django's static serve view or via
 a lightweight server in production. Read more
 [here](https://docs.djangoproject.com/en/dev/howto/static-files/#serving-other-directories)
 
+`TRACK_IGNORE_STATUS_CODES` - A list of HttpResponse status_codes that will be ignored.
+If the HttpResponse object has a status_code in this blacklist, the pageview record 
+will not be saved. For example,
+
+```python
+TRACK_IGNORE_STATUS_CODES = [400, 404, 403, 405, 410, 500]
+```
+
 Views
 -----
 To view aggregate data about all visitors and per-registered user stats,
