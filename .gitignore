@@ -5,3 +5,5 @@
 .DS_Store
 dist
 MANIFEST
+*~
+django_tracking2.egg-info
