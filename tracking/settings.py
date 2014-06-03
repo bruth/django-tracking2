@@ -16,3 +16,5 @@ if hasattr(settings, 'TRACKING_USE_GEOIP'):
     raise DeprecationWarning('TRACKING_USE_GEOIP has been renamed to TRACK_USING_GEOIP')
 
 TRACK_REFERER = getattr(settings, 'TRACK_REFERER', False)
+
+TRACK_QUERY_STRING = getattr(settings, 'TRACK_QUERY_STRING', False)

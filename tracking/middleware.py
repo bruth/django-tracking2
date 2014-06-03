@@ -5,7 +5,7 @@ from django.utils import timezone
 from tracking.models import Visitor, Pageview
 from tracking.utils import get_ip_address
 from tracking.settings import (TRACK_AJAX_REQUESTS,
-    TRACK_ANONYMOUS_USERS, TRACK_PAGEVIEWS, TRACK_IGNORE_URLS, TRACK_IGNORE_STATUS_CODES, TRACK_REFERER)
+    TRACK_ANONYMOUS_USERS, TRACK_PAGEVIEWS, TRACK_IGNORE_URLS, TRACK_IGNORE_STATUS_CODES, TRACK_REFERER, TRACK_QUERY_STRING)
 
 TRACK_IGNORE_URLS = map(lambda x: re.compile(x), TRACK_IGNORE_URLS)
 
@@ -80,11 +80,16 @@ class VisitorTrackingMiddleware(object):
                     break
             else:
                 referer = None
+                query_string = None
+
                 if TRACK_REFERER:
                     referer = request.META.get('HTTP_REFERER', None)
-                    
+
+                if TRACK_QUERY_STRING:
+                    query_string = request.META.get('QUERY_STRING')
+
                 pageview = Pageview(visitor=visitor, url=request.path,
-                    view_time=now, method=request.method, referer=referer)
+                    view_time=now, method=request.method, referer=referer, query_string=query_string)
                 pageview.save()
 
         return response
