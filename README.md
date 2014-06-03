@@ -80,6 +80,8 @@ will not be saved. For example,
 TRACK_IGNORE_STATUS_CODES = [400, 404, 403, 405, 410, 500]
 ```
 
+`TRACK_REFERER` - If True, referring site for all pageviews will be tracked.  Default is False
+
 Views
 -----
 To view aggregate data about all visitors and per-registered user stats,
