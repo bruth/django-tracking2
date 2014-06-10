@@ -9,8 +9,6 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
 
-        # Changing field 'Visitor.user'
-        db.alter_column(u'tracking_visitor', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['core.VantageUser']))
         # Adding field 'Pageview.referer'
         db.add_column(u'tracking_pageview', 'referer',
                       self.gf('django.db.models.fields.TextField')(null=True),
@@ -19,8 +17,6 @@ class Migration(SchemaMigration):
 
     def backwards(self, orm):
 
-        # Changing field 'Visitor.user'
-        db.alter_column(u'tracking_visitor', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['auth.User']))
         # Deleting field 'Pageview.referer'
         db.delete_column(u'tracking_pageview', 'referer')
 
@@ -81,7 +77,7 @@ class Migration(SchemaMigration):
             'session_key': ('django.db.models.fields.CharField', [], {'max_length': '40', 'primary_key': 'True'}),
             'start_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'time_on_site': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'visit_history'", 'null': 'True', 'to': u"orm['core.VantageUser']"}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'visit_history'", 'null': 'True', 'to': u"orm['auth.User']"}),
             'user_agent': ('django.db.models.fields.TextField', [], {'null': 'True'})
         }
     }
