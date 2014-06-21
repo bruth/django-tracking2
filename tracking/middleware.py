@@ -7,7 +7,7 @@ from tracking.utils import get_ip_address
 from tracking.settings import (TRACK_AJAX_REQUESTS,
     TRACK_ANONYMOUS_USERS, TRACK_PAGEVIEWS, TRACK_IGNORE_URLS, TRACK_IGNORE_STATUS_CODES, TRACK_REFERER, TRACK_QUERY_STRING)
 
-TRACK_IGNORE_URLS = map(lambda x: re.compile(x), TRACK_IGNORE_URLS)
+TRACK_IGNORE_URLS = [re.compile(x) for x in TRACK_IGNORE_URLS]
 
 log = logging.getLogger(__file__)
 
