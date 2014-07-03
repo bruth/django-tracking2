@@ -159,7 +159,7 @@ def _explode_shorthand_ip_string(ip_str):
         sep = len(hextet[0].split(':')) + len(hextet[1].split(':'))
         new_ip = hextet[0].split(':')
 
-        for _ in xrange(fill_to - sep):
+        for _ in range(fill_to - sep):
             new_ip.append('0000')
         new_ip += hextet[1].split(':')
 
@@ -186,7 +186,7 @@ def _is_shorthand_ip(ip_str):
     """
     if ip_str.count('::') == 1:
         return True
-    if filter(lambda x: len(x) < 4, ip_str.split(':')):
+    if [x for x in ip_str.split(':') if len(x) < 4]:
         return True
     return False
 
