@@ -10,8 +10,6 @@ env:
     - DJANGO=1.4.13
     - DJANGO=1.5.8
     - DJANGO=1.6.5
-virtualenv:
-    system_site_packages: true
 install:
     - pip install -q Django==$DJANGO --use-mirrors
 script:
