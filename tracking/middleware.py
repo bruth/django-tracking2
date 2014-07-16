@@ -46,10 +46,13 @@ class VisitorTrackingMiddleware(object):
         try:
             visitor = Visitor.objects.get(pk=session_key)
         except Visitor.DoesNotExist:
+            visitor_user_agent = request.META.get('HTTP_USER_AGENT', None)
+            if visitor_user_agent is not None:
+                visitor_user_agent.decode('UTF-16').encode('UTF-8')
             # Log the ip address. Start time is managed via the
             # field `default` value
             visitor = Visitor(pk=session_key, ip_address=get_ip_address(request),
-                user_agent=request.META.get('HTTP_USER_AGENT', None))
+                user_agent=visitor_user_agent)
 
         # Update the user field if the visitor user is not set. This
         # implies authentication has occured on this request and now
@@ -70,7 +73,8 @@ class VisitorTrackingMiddleware(object):
             time_on_site = (now - visitor.start_time).seconds
         visitor.time_on_site = time_on_site
 
-        visitor.save()
+        try:
+            visitor.save()
 
         if TRACK_PAGEVIEWS:
             # Match against `path_info` to not include the SCRIPT_NAME..
