@@ -73,8 +73,7 @@ class VisitorTrackingMiddleware(object):
             time_on_site = (now - visitor.start_time).seconds
         visitor.time_on_site = time_on_site
 
-        try:
-            visitor.save()
+        visitor.save()
 
         if TRACK_PAGEVIEWS:
             # Match against `path_info` to not include the SCRIPT_NAME..
