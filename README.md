@@ -42,6 +42,8 @@ INSTALLED_APPS = (
 )
 ```
 
+If you use Django 1.7 `tracking` app should follow the app with your user model
+
 Add `tracking.middleware.VisitorTrackingMiddleware` to your project's
 `MIDDLEWARE_CLASSES` before the `SessionMiddleware`:
 
