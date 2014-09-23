@@ -5,7 +5,7 @@ kwargs = {
     'packages': find_packages(exclude=['tests', '*.tests', '*.tests.*', 'tests.*']),
     'include_package_data': True,
     'install_requires': [
-        'django>=1.4,<1.7',
+        'django>=1.4,<1.8',
     ],
     'name': 'django-tracking2',
     'version': __import__('tracking').get_version(),
