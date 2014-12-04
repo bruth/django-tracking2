@@ -19,7 +19,10 @@ def adjusted_date_range(start=None, end=None):
 class VisitorManager(CacheManager):
     def active(self, registered_only=True):
         "Returns all active users, e.g. not logged and non-expired session."
-        visitors = self.get_queryset().filter(expiry_time__gt=timezone.now(), end_time=None)
+        visitors = self.get_queryset().filter(
+            expiry_time__gt=timezone.now(),
+            end_time=None
+        )
         if registered_only:
             visitors = visitors.filter(user__isnull=False)
         return visitors
@@ -32,9 +35,14 @@ class VisitorManager(CacheManager):
 
     def tracked_dates(self):
         "Returns a date range of when tracking has occured."
-        dates = self.get_queryset().aggregate(start_min=Min('start_time'), start_max=Max('start_time'))
-        if dates:
-            return [dates['start_min'].date(), dates['start_max'].date()]
+        dates = self.get_queryset().aggregate(
+            start_min=Min('start_time'),
+            start_max=Max('start_time')
+        )
+        start_min = dates['start_min']
+        start_max = dates['start_max']
+        if start_min and start_max:
+            return [start_min.date(), start_max.date()]
         return []
 
     def stats(self, start_date=None, end_date=None, registered_only=False):
