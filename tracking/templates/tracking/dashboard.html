@@ -1,20 +1,16 @@
-{% extends "base.html" %}
+{% if errors %}
+    <ul id=tracking-errors>
+        {% for e in errors %}
+        <li>{{ e|safe }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
 
-{% block content %}
-    {% if errors %}
-        <ul id=tracking-errors>
-            {% for e in errors %}
-            <li>{{ e|safe }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+{% if warn_start_time %}
+    <p class=warning>The start date precedes the oldest tracked visitor, thus
+    the stats are not complete for the specified date range.</p>
+{% endif %}
 
-    {% if warn_start_time %}
-        <p class=warning>The start date preceeds the oldest tracked visitor, thus
-        the stats are not complete for the specified date range.</p>
-    {% endif %}
+{% include "tracking/snippets/stats.html" %}
 
-    {% include "tracking/snippets/stats.html" %}                
-
-    <p>Tracking began on {{ track_start_time|date:"M d, Y @ g:i:s a" }}</p>
-{% endblock %}
+<p>Tracking began on {{ track_start_time|date:"M d, Y @ g:i:s a" }}</p>
