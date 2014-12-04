@@ -2,8 +2,7 @@ import logging
 import calendar
 from warnings import warn
 from datetime import datetime, time
-from datetime import date, timedelta
-from django.db.models import Min
+from datetime import date
 from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
 from django.utils.timezone import now
@@ -11,6 +10,7 @@ from tracking.models import Visitor, Pageview
 from tracking.settings import TRACK_PAGEVIEWS
 
 log = logging.getLogger(__file__)
+
 
 def parse_partial_date(date_str, upper=False):
     if not date_str:
