@@ -1,15 +1,22 @@
 import re
 import logging
-from datetime import datetime
 from django.utils import timezone
 from tracking.models import Visitor, Pageview
 from tracking.utils import get_ip_address
-from tracking.settings import (TRACK_AJAX_REQUESTS,
-    TRACK_ANONYMOUS_USERS, TRACK_PAGEVIEWS, TRACK_IGNORE_URLS, TRACK_IGNORE_STATUS_CODES, TRACK_REFERER, TRACK_QUERY_STRING)
+from tracking.settings import (
+    TRACK_AJAX_REQUESTS,
+    TRACK_ANONYMOUS_USERS,
+    TRACK_IGNORE_STATUS_CODES,
+    TRACK_IGNORE_URLS,
+    TRACK_PAGEVIEWS,
+    TRACK_QUERY_STRING,
+    TRACK_REFERER,
+)
 
-TRACK_IGNORE_URLS = [re.compile(x) for x in TRACK_IGNORE_URLS]
+track_ignore_urls = [re.compile(x) for x in TRACK_IGNORE_URLS]
 
 log = logging.getLogger(__file__)
+
 
 class VisitorTrackingMiddleware(object):
     def process_response(self, request, response):
@@ -48,10 +55,12 @@ class VisitorTrackingMiddleware(object):
         except Visitor.DoesNotExist:
             visitor_user_agent = request.META.get('HTTP_USER_AGENT', None)
             if visitor_user_agent is not None:
-                visitor_user_agent = visitor_user_agent.decode('latin-1', errors='ignore')
+                visitor_user_agent = visitor_user_agent.decode(
+                    'latin-1', errors='ignore')
             # Log the ip address. Start time is managed via the
             # field `default` value
-            visitor = Visitor(pk=session_key, ip_address=get_ip_address(request),
+            visitor = Visitor(
+                pk=session_key, ip_address=get_ip_address(request),
                 user_agent=visitor_user_agent)
 
         # Update the user field if the visitor user is not set. This
@@ -78,7 +87,7 @@ class VisitorTrackingMiddleware(object):
         if TRACK_PAGEVIEWS:
             # Match against `path_info` to not include the SCRIPT_NAME..
             path = request.path_info.lstrip('/')
-            for url in TRACK_IGNORE_URLS:
+            for url in track_ignore_urls:
                 if url.match(path):
                     break
             else:
@@ -91,8 +100,10 @@ class VisitorTrackingMiddleware(object):
                 if TRACK_QUERY_STRING:
                     query_string = request.META.get('QUERY_STRING')
 
-                pageview = Pageview(visitor=visitor, url=request.path,
-                    view_time=now, method=request.method, referer=referer, query_string=query_string)
+                pageview = Pageview(
+                    visitor=visitor, url=request.path, view_time=now,
+                    method=request.method, referer=referer,
+                    query_string=query_string)
                 pageview.save()
 
         return response
