@@ -11,7 +11,13 @@ class ViewsTestCase(TestCase):
         user.save()
         self.assertTrue(self.client.login(**self.auth))
 
-    def test_dashboard(self):
+    def test_dashboard_default(self):
         # make a non PAGEVIEW tracking request
         response = self.client.get('/tracking/dashboard/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_dashboard_times(self):
+        # make a non PAGEVIEW tracking request
+        response = self.client.get(
+            '/tracking/dashboard/?start=2014-11&end=2014-12-01')
         self.assertEqual(response.status_code, 200)
