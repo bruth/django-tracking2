@@ -15,6 +15,7 @@ env:
 
 install:
     - pip install -q Django==$DJANGO --use-mirrors
+    - pip install mock coverage
     - python setup.py develop
 
 script:
