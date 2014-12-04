@@ -2,6 +2,8 @@
 *.py?
 *~
 *.egg-info
+*.egg/
 .DS_Store
 dist
 MANIFEST
+.coverage
