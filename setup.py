@@ -1,8 +1,8 @@
-import sys
 from setuptools import setup, find_packages
 
 kwargs = {
-    'packages': find_packages(exclude=['tests', '*.tests', '*.tests.*', 'tests.*']),
+    'packages': find_packages(
+        exclude=['tests', '*.tests', '*.tests.*', 'tests.*']),
     'include_package_data': True,
     'install_requires': [
         'django>=1.4,<1.8',
@@ -11,8 +11,8 @@ kwargs = {
     'version': __import__('tracking').get_version(),
     'author': 'Byron Ruth',
     'author_email': 'b@devel.io',
-    'description': 'django-tracking2 tracks the length of time visitors '\
-        'and registered users spend on your site',
+    'description': ('django-tracking2 tracks the length of time visitors '
+                    'and registered users spend on your site'),
     'license': 'BSD',
     'keywords': 'visitor tracking time analytics',
     'url': 'https://github.com/bruth/django-tracking2',
