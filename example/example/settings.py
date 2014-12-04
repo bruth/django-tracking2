@@ -26,11 +26,6 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
-##
-# django-tracking2 options
-##
-TRACK_PAGEVIEWS = True
-
 # Application definition
 
 INSTALLED_APPS = (
