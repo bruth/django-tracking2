@@ -6,7 +6,7 @@ from django.db.models.query import QuerySet
 
 def instance_cache_key(instance):
     opts = instance._meta
-    return '%s.%s:%s' % (opts.app_label, opts.module_name, instance.pk)
+    return '%s.%s:%s' % (opts.app_label, opts.model_name, instance.pk)
 
 
 class CacheQuerySet(QuerySet):
@@ -18,7 +18,7 @@ class CacheQuerySet(QuerySet):
                 break
         if pk is not None:
             opts = self.model._meta
-            key = '%s.%s:%s' % (opts.app_label, opts.module_name, pk)
+            key = '%s.%s:%s' % (opts.app_label, opts.model_name, pk)
             obj = cache.get(key)
             if obj is not None:
                 self._result_cache = [obj]
