@@ -56,7 +56,7 @@ class VisitorTrackingMiddleware(object):
             visitor_user_agent = request.META.get('HTTP_USER_AGENT', None)
             if visitor_user_agent is not None:
                 visitor_user_agent = visitor_user_agent.decode(
-                    'latin-1', errors='ignore')
+                    'latin-1', 'ignore')
             # Log the ip address. Start time is managed via the
             # field `default` value
             visitor = Visitor(
