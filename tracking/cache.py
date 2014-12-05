@@ -3,9 +3,15 @@ from django.db import models
 from django.core.cache import cache
 from django.db.models.query import QuerySet
 
+
 def instance_cache_key(instance):
     opts = instance._meta
-    return '%s.%s:%s' % (opts.app_label, opts.module_name, instance.pk)
+    if hasattr(opts, 'model_name'):
+        name = opts.model_name
+    else:
+        name = opts.module_name
+    return '%s.%s:%s' % (opts.app_label, name, instance.pk)
+
 
 class CacheQuerySet(QuerySet):
     def filter(self, *args, **kwargs):
@@ -16,7 +22,7 @@ class CacheQuerySet(QuerySet):
                 break
         if pk is not None:
             opts = self.model._meta
-            key = '%s.%s:%s' % (opts.app_label, opts.module_name, pk)
+            key = '%s.%s:%s' % (opts.app_label, opts.model_name, pk)
             obj = cache.get(key)
             if obj is not None:
                 self._result_cache = [obj]
@@ -24,6 +30,6 @@ class CacheQuerySet(QuerySet):
 
 
 class CacheManager(models.Manager):
-    def get_query_set(self):
+    def get_queryset(self):
         return CacheQuerySet(self.model)
 

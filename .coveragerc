@@ -1,0 +1,10 @@
+# .coveragerc to control coverage.py
+[run]
+branch = True
+source = .
+
+[report]
+omit =
+  setup.py
+  example/*
+  tracking/migrations/*

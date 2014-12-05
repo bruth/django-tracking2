@@ -1,10 +1,11 @@
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from django.utils import timezone
 from django.db import models
 from django.db.models import Count, Avg, Min, Max
 from tracking.settings import TRACK_PAGEVIEWS, TRACK_ANONYMOUS_USERS
 from tracking.cache import CacheManager
 from .compat import User
+
 
 def adjusted_date_range(start=None, end=None):
     today = date.today()
@@ -14,25 +15,34 @@ def adjusted_date_range(start=None, end=None):
         end = today
     return start, end
 
+
 class VisitorManager(CacheManager):
     def active(self, registered_only=True):
         "Returns all active users, e.g. not logged and non-expired session."
-        visitors = self.get_query_set().filter(expiry_time__gt=timezone.now(), end_time=None)
+        visitors = self.get_queryset().filter(
+            expiry_time__gt=timezone.now(),
+            end_time=None
+        )
         if registered_only:
             visitors = visitors.filter(user__isnull=False)
         return visitors
 
     def registered(self):
-        return self.get_query_set().filter(user__isnull=False)
+        return self.get_queryset().filter(user__isnull=False)
 
     def guests(self):
-        return self.get_query_set().filter(user__isnull=True)
+        return self.get_queryset().filter(user__isnull=True)
 
     def tracked_dates(self):
         "Returns a date range of when tracking has occured."
-        dates = self.get_query_set().aggregate(start_min=Min('start_time'), start_max=Max('start_time'))
-        if dates:
-            return [dates['start_min'].date(), dates['start_max'].date()]
+        dates = self.get_queryset().aggregate(
+            start_min=Min('start_time'),
+            start_max=Max('start_time')
+        )
+        start_min = dates['start_min']
+        start_max = dates['start_max']
+        if start_min and start_max:
+            return [start_min.date(), start_max.date()]
         return []
 
     def stats(self, start_date=None, end_date=None, registered_only=False):
@@ -59,7 +69,7 @@ class VisitorManager(CacheManager):
         }
 
         # All visitors
-        visitors = self.get_query_set().filter(**kwargs)
+        visitors = self.get_queryset().filter(**kwargs)
         stats['total'] = total_count = visitors.count()
         unique_count = 0
 
@@ -190,7 +200,7 @@ class PageviewManager(models.Manager):
             'unique': 0,
         }
 
-        pageviews = self.get_query_set().filter(**kwargs).select_related('visitor')
+        pageviews = self.get_queryset().filter(**kwargs).select_related('visitor')
         stats['total'] = total_views = pageviews.count()
         unique_count = 0
 

@@ -1,9 +1,9 @@
 import logging
 import calendar
+
 from warnings import warn
 from datetime import datetime, time
-from datetime import date, timedelta
-from django.db.models import Min
+from datetime import date
 from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
 from django.utils.timezone import now
@@ -11,6 +11,7 @@ from tracking.models import Visitor, Pageview
 from tracking.settings import TRACK_PAGEVIEWS
 
 log = logging.getLogger(__file__)
+
 
 def parse_partial_date(date_str, upper=False):
     if not date_str:
@@ -43,22 +44,29 @@ def dashboard(request):
     "Counts, aggregations and more!"
     errors = []
     start_date, end_date = None, None
+    err_message = '<code>{value}</code> is not a valid {field}'
+
+    # get the dates of the request
+    start_str = request.GET.get('start', None)
+    end_str = request.GET.get('end', None)
 
     try:
-        start_str = request.GET.get('start', None)
         start_date = parse_partial_date(start_str)
     except (ValueError, TypeError):
-        errors.append('<code>{0}</code> is not a valid start date'.format(start_str))
+        errors.append(err_message.format(value=start_str, field='start date'))
 
     try:
-        end_str = request.GET.get('end', None)
         end_date = parse_partial_date(end_str, upper=True)
     except (ValueError, TypeError):
-        errors.append('<code>{0}</code> is not a valid end date'.format(end_str))
+        errors.append(err_message.format(value=start_str, field='end date'))
 
     user_stats = list(Visitor.objects.user_stats(start_date, end_date))
 
-    track_start_time = Visitor.objects.order_by('start_time')[0].start_time
+    try:
+        track_start_time = Visitor.objects.latest('start_time').start_time
+    except Visitor.DoesNotExist:
+        track_start_time = now()
+
     # If the start_date is later than when tracking began, no reason
     # to warn about missing data
     if start_date and calendar.timegm(start_date.timetuple()) < calendar.timegm(track_start_time.timetuple()):

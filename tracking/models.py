@@ -1,6 +1,5 @@
 import logging
 import traceback
-from datetime import datetime
 from django.utils import timezone
 from django.contrib.gis.geoip import HAS_GEOIP
 if HAS_GEOIP:
@@ -8,7 +7,7 @@ if HAS_GEOIP:
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.signals import user_logged_out
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import post_save
 from tracking.managers import VisitorManager, PageviewManager
 from tracking.settings import TRACK_USING_GEOIP
 from .compat import User
@@ -17,10 +16,11 @@ GEOIP_CACHE_TYPE = getattr(settings, 'GEOIP_CACHE_TYPE', 4)
 
 log = logging.getLogger(__file__)
 
+
 class Visitor(models.Model):
     session_key = models.CharField(max_length=40, primary_key=True)
     user = models.ForeignKey(User, related_name='visit_history',
-        null=True, editable=False)
+                             null=True, editable=False)
     # Update to GenericIPAddress in Django 1.4
     ip_address = models.CharField(max_length=39, editable=False)
     user_agent = models.TextField(null=True, editable=False)
