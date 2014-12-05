@@ -6,7 +6,11 @@ from django.db.models.query import QuerySet
 
 def instance_cache_key(instance):
     opts = instance._meta
-    return '%s.%s:%s' % (opts.app_label, opts.model_name, instance.pk)
+    if hasattr(opts, 'model_name'):
+        name = opts.model_name
+    else:
+        name = opts.module_name
+    return '%s.%s:%s' % (opts.app_label, name, instance.pk)
 
 
 class CacheQuerySet(QuerySet):
