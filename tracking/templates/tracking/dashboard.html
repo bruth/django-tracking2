@@ -1,16 +1,30 @@
-{% if errors %}
-    <ul id=tracking-errors>
-        {% for e in errors %}
-        <li>{{ e|safe }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
-
-{% if warn_start_time %}
-    <p class=warning>The start date precedes the oldest tracked visitor, thus
-    the stats are not complete for the specified date range.</p>
-{% endif %}
-
-{% include "tracking/snippets/stats.html" %}
-
-<p>Tracking began on {{ track_start_time|date:"M d, Y @ g:i:s a" }}</p>
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Dashboard - django-tracking2</title>
+    </head>
+    <body>
+        <h1>Dashboard - django-tracking2</h1>
+        <div id="tracking-filters">
+            <form method="GET">
+                {{ form.as_table }}
+                <input type="submit" name="submit" value="submit" />
+            </form>
+        </div>
+        <div id="tracking-info">
+            <p>
+                Visitor tracking began on
+                {{ track_start_time|date:"Y-m-d H:i:s" }}
+            </p>
+            {% if warn_start_time %}
+            <p class=warning>
+                The start time precedes the oldest tracked visitor, thus
+                the stats are not complete for the specified range.
+            </p>
+            {% endif %}
+        </div>
+        <div id="tracking-stats">
+            {% include "tracking/snippets/stats.html" %}
+        </div>
+    </body>
+</html>
