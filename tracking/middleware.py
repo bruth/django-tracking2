@@ -1,8 +1,9 @@
 import re
 import logging
-import sys
 
 from django.utils import timezone
+from django.utils.encoding import smart_text
+
 from tracking.models import Visitor, Pageview
 from tracking.utils import get_ip_address
 from tracking.settings import (
@@ -18,13 +19,6 @@ from tracking.settings import (
 track_ignore_urls = [re.compile(x) for x in TRACK_IGNORE_URLS]
 
 log = logging.getLogger(__file__)
-
-if sys.version_info[0] == 2:
-    def _str(s, encoding, errors):
-        return unicode(s, encoding, errors)
-else:
-    def _str(s, encoding, errors):
-        return s
 
 
 class VisitorTrackingMiddleware(object):
@@ -64,8 +58,8 @@ class VisitorTrackingMiddleware(object):
         except Visitor.DoesNotExist:
             visitor_user_agent = request.META.get('HTTP_USER_AGENT', None)
             if visitor_user_agent is not None:
-                visitor_user_agent = _str(
-                    visitor_user_agent, 'latin-1', 'ignore')
+                visitor_user_agent = smart_text(
+                    visitor_user_agent, encoding='latin-1', errors='ignore')
             # Log the ip address. Start time is managed via the
             # field `default` value
             visitor = Visitor(

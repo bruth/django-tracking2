@@ -27,6 +27,12 @@ class MiddlewareTestCase(TestCase):
         visitor = Visitor.objects.get()
         self.assertEqual(visitor.user_agent, 'django')
 
+    def test_track_user_agent_unicode(self):
+        self.client.get('/', HTTP_USER_AGENT=u'django')
+        self.assertEqual(Visitor.objects.count(), 1)
+        visitor = Visitor.objects.get()
+        self.assertEqual(visitor.user_agent, 'django')
+
     @patch('tracking.middleware.TRACK_ANONYMOUS_USERS', False)
     def test_track_anonymous_users(self):
         self.client.get('/')
