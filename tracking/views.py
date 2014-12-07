@@ -33,7 +33,7 @@ class DashboardForm(forms.Form):
 def dashboard(request):
     "Counts, aggregations and more!"
     end_time = now()
-    start_time = end_time - timedelta(days=1)
+    start_time = end_time - timedelta(days=7)
     defaults = {'start_time': start_time, 'end_time': end_time}
 
     form = DashboardForm(data=request.GET or defaults)
