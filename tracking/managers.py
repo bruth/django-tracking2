@@ -26,7 +26,7 @@ class VisitorManager(CacheManager):
     def guests(self):
         return self.get_queryset().filter(user__isnull=True)
 
-    def stats(self, start_date=None, end_date=None, registered_only=False):
+    def stats(self, start_time, end_time, registered_only=False):
         """Returns a dictionary of visits including:
 
             * total visits
@@ -37,9 +37,10 @@ class VisitorManager(CacheManager):
 
         for all users, registered users and guests.
         """
-        kwargs = {'start_time__lt': end_date}
-        if start_date:
-            kwargs['start_time__gte'] = start_date
+        visitors = self.get_queryset().filter(
+            start_time__gte=start_time,
+            start_time__lt=end_time
+        )
 
         stats = {
             'total': 0,
@@ -48,7 +49,6 @@ class VisitorManager(CacheManager):
         }
 
         # All visitors
-        visitors = self.get_queryset().filter(**kwargs)
         stats['total'] = total_count = visitors.count()
         unique_count = 0
 
@@ -101,15 +101,14 @@ class VisitorManager(CacheManager):
                 returns = (guest_total_count - guest_unique_count)
                 return_ratio = (returns / guest_total_count) * 100
                 time_on_site = timedelta(seconds=int(guest_time_on_site))
-
-                # Update the total unique count...
-                unique_count += guest_unique_count
             else:
                 guest_total_count = 0
                 guest_unique_count = 0
                 return_ratio = 0.0
                 time_on_site = timedelta(0)
 
+            # Update the total unique count
+            unique_count += guest_unique_count
             stats['guests'] = {
                 'total': guest_total_count,
                 'unique': guest_unique_count,
@@ -151,16 +150,16 @@ class VisitorManager(CacheManager):
 
         return stats
 
-    def user_stats(self, start_date, end_date):
+    def user_stats(self, start_time=None, end_time=None):
         user_kwargs = {
-            'visit_history__start_time__lt': end_date,
+            'visit_history__start_time__lt': end_time,
         }
         visit_kwargs = {
-            'start_time__lt': end_date,
+            'start_time__lt': end_time,
         }
-        if start_date:
-            user_kwargs['visit_history__start_time__gte'] = start_date
-            visit_kwargs['start_time__gte'] = start_date
+        if start_time:
+            user_kwargs['visit_history__start_time__gte'] = start_time
+            visit_kwargs['start_time__gte'] = start_time
         else:
             user_kwargs['visit_history__start_time__isnull'] = False
             visit_kwargs['start_time__isnull'] = False
@@ -184,26 +183,23 @@ class VisitorManager(CacheManager):
 
 
 class PageviewManager(models.Manager):
-    def stats(self, start_date=None, end_date=None, registered_only=False):
+    def stats(self, start_time=None, end_time=None, registered_only=False):
         """Returns a dictionary of pageviews including:
 
             * total pageviews
 
         for all users, registered users and guests.
         """
-        kwargs = {
-            'visitor__start_time__lt': end_date,
-        }
-        if start_date:
-            kwargs['visitor__start_time__gte'] = start_date
+        pageviews = self.get_queryset().filter(
+            visitor__start_time__lt=end_time,
+            visitor__start_time__gte=start_time,
+        ).select_related('visitor')
 
         stats = {
             'total': 0,
             'unique': 0,
         }
 
-        pageviews = self.get_queryset().filter(
-            **kwargs).select_related('visitor')
         stats['total'] = total_views = pageviews.count()
         unique_count = 0
 

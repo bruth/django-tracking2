@@ -40,10 +40,9 @@ class VisitorManagerTestCase(TestCase):
 
     def test_visitor_stats(self):
         self._create_visits_and_views()
-        start_time = self.base_time - timedelta(minutes=1)
-        end_time = start_time + timedelta(days=1)
-        stats = Visitor.objects.stats(
-            start_date=start_time.date(), end_date=end_time.date())
+        start_time = self.base_time - timedelta(days=1)
+        end_time = start_time + timedelta(days=2)
+        stats = Visitor.objects.stats(start_time, end_time)
         self.assertEqual(stats['time_on_site'], timedelta(seconds=30))
         self.assertEqual(stats['total'], 2)
         self.assertEqual(stats['return_ratio'], 0.0)
@@ -67,9 +66,8 @@ class VisitorManagerTestCase(TestCase):
         self.assertEqual(stats['guests'], guests)
 
         # now expand the end time to include `future` as well
-        end_time = start_time + timedelta(days=2)
-        stats = Visitor.objects.stats(
-            start_date=start_time.date(), end_date=end_time.date())
+        end_time = start_time + timedelta(days=3)
+        stats = Visitor.objects.stats(start_time, end_time)
         self.assertEqual(stats['pages_per_visit'], 4 / 3)
         guests = {
             'time_on_site': timedelta(seconds=30),
