@@ -51,13 +51,10 @@ def dashboard(request):
     warn_incomplete = (start_time < track_start_time)
 
     # queries take `date` objects (for now)
-    start_date = start_time.date()
-    end_date = end_time.date()
-
-    user_stats = Visitor.objects.user_stats(start_date, end_date)
-    visitor_stats = Visitor.objects.stats(start_date, end_date)
+    user_stats = Visitor.objects.user_stats(start_time, end_time)
+    visitor_stats = Visitor.objects.stats(start_time, end_time)
     if TRACK_PAGEVIEWS:
-        pageview_stats = Pageview.objects.stats(start_date, end_date)
+        pageview_stats = Pageview.objects.stats(start_time, end_time)
     else:
         pageview_stats = None
 
