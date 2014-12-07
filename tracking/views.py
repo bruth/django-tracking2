@@ -23,10 +23,8 @@ input_formats = [
 
 
 class DashboardForm(forms.Form):
-    start_time = forms.DateTimeField(
-        required=False, input_formats=input_formats)
-    end_time = forms.DateTimeField(
-        required=False, input_formats=input_formats)
+    start = forms.DateTimeField(required=False, input_formats=input_formats)
+    end = forms.DateTimeField(required=False, input_formats=input_formats)
 
 
 @permission_required('tracking.view_visitor')
@@ -34,12 +32,12 @@ def dashboard(request):
     "Counts, aggregations and more!"
     end_time = now()
     start_time = end_time - timedelta(days=7)
-    defaults = {'start_time': start_time, 'end_time': end_time}
+    defaults = {'start': start_time, 'end': end_time}
 
     form = DashboardForm(data=request.GET or defaults)
     if form.is_valid():
-        start_time = form.cleaned_data['start_time']
-        end_time = form.cleaned_data['end_time']
+        start_time = form.cleaned_data['start']
+        end_time = form.cleaned_data['end']
 
     # determine when tracking began
     try:
