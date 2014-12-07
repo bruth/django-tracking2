@@ -26,7 +26,7 @@ class VisitorManager(CacheManager):
     def guests(self):
         return self.get_queryset().filter(user__isnull=True)
 
-    def stats(self, start_time, end_time, registered_only=False):
+    def stats(self, start_date, end_date, registered_only=False):
         """Returns a dictionary of visits including:
 
             * total visits
@@ -38,8 +38,8 @@ class VisitorManager(CacheManager):
         for all users, registered users and guests.
         """
         visitors = self.get_queryset().filter(
-            start_time__gte=start_time,
-            start_time__lt=end_time
+            start_time__gte=start_date,
+            start_time__lt=end_date
         )
 
         stats = {
@@ -150,16 +150,16 @@ class VisitorManager(CacheManager):
 
         return stats
 
-    def user_stats(self, start_time=None, end_time=None):
+    def user_stats(self, start_date=None, end_date=None):
         user_kwargs = {
-            'visit_history__start_time__lt': end_time,
+            'visit_history__start_time__lt': end_date,
         }
         visit_kwargs = {
-            'start_time__lt': end_time,
+            'start_time__lt': end_date,
         }
-        if start_time:
-            user_kwargs['visit_history__start_time__gte'] = start_time
-            visit_kwargs['start_time__gte'] = start_time
+        if start_date:
+            user_kwargs['visit_history__start_time__gte'] = start_date
+            visit_kwargs['start_time__gte'] = start_date
         else:
             user_kwargs['visit_history__start_time__isnull'] = False
             visit_kwargs['start_time__isnull'] = False
@@ -183,7 +183,7 @@ class VisitorManager(CacheManager):
 
 
 class PageviewManager(models.Manager):
-    def stats(self, start_time=None, end_time=None, registered_only=False):
+    def stats(self, start_date=None, end_date=None, registered_only=False):
         """Returns a dictionary of pageviews including:
 
             * total pageviews
@@ -191,8 +191,8 @@ class PageviewManager(models.Manager):
         for all users, registered users and guests.
         """
         pageviews = self.get_queryset().filter(
-            visitor__start_time__lt=end_time,
-            visitor__start_time__gte=start_time,
+            visitor__start_time__lt=end_date,
+            visitor__start_time__gte=start_date,
         ).select_related('visitor')
 
         stats = {
