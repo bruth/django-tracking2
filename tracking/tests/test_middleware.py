@@ -1,9 +1,17 @@
 import re
+import sys
 
 from django.test import TestCase
 from mock import patch
 
 from tracking.models import Visitor, Pageview
+
+if sys.version_info[0] == 3:
+    def _u(s):
+        return s
+else:
+    def _u(s):
+        return unicode(s)
 
 
 class MiddlewareTestCase(TestCase):
@@ -28,7 +36,7 @@ class MiddlewareTestCase(TestCase):
         self.assertEqual(visitor.user_agent, 'django')
 
     def test_track_user_agent_unicode(self):
-        self.client.get('/', HTTP_USER_AGENT=u'django')
+        self.client.get('/', HTTP_USER_AGENT=_u('django'))
         self.assertEqual(Visitor.objects.count(), 1)
         visitor = Visitor.objects.get()
         self.assertEqual(visitor.user_agent, 'django')
