@@ -1,6 +1,7 @@
 Overview
 ========
 
+[![Build Status](https://travis-ci.org/bruth/django-tracking2.svg?branch=master)](https://travis-ci.org/bruth/django-tracking2)
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/bruth/django-tracking2/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 django-tracking2 tracks the length of time visitors and registered users
@@ -74,8 +75,8 @@ since they should be served up statically Django's static serve view or via
 a lightweight server in production. Read more
 [here](https://docs.djangoproject.com/en/dev/howto/static-files/#serving-other-directories)
 
-`TRACK_IGNORE_STATUS_CODES` - A list of HttpResponse status_codes that will be ignored.
-If the HttpResponse object has a status_code in this blacklist, the pageview record 
+`TRACK_IGNORE_STATUS_CODES` - A list of HttpResponse status codes that will be ignored.
+If the HttpResponse object has a `status_code` in this blacklist, the pageview record 
 will not be saved. For example,
 
 ```python
@@ -106,7 +107,8 @@ Thus only superusers and users granted this permission can view these pages.
 
 Available URLs
 --------------
-* `/dashboard/` - overview of all visitor activity
+* `/` - overview of all visitor activity, includes a time picker for
+        filtering.
 
 Templates
 ---------
