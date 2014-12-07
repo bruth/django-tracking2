@@ -42,37 +42,32 @@ def dashboard(request):
         start_time = form.cleaned_data['start_time']
         end_time = form.cleaned_data['end_time']
 
-    user_stats = Visitor.objects.user_stats(
-        start_time.date(), end_time.date())
-
+    # determine when tracking began
     try:
-        track_start_time = Visitor.objects.latest('start_time').start_time
+        track_start_time = Visitor.objects.earliest('start_time').start_time
     except Visitor.DoesNotExist:
         track_start_time = now()
 
-    # If the start_date is later than when tracking began, no reason
-    # to warn about missing data
-    start_timestamp = calendar.timegm(start_time.timetuple())
-    tracking_timestamp = calendar.timegm(track_start_time.timetuple())
-    if start_timestamp < tracking_timestamp:
-        warn_start_time = track_start_time
+    # If the start_date is before tracking began, warn about incomplete data
+    warn_incomplete = (start_time < track_start_time)
+
+    # queries take `date` objects (for now)
+    start_date = start_time.date()
+    end_date = end_time.date()
+
+    user_stats = Visitor.objects.user_stats(start_date, end_date)
+    visitor_stats = Visitor.objects.stats(start_date, end_date)
+    if TRACK_PAGEVIEWS:
+        pageview_stats = Pageview.objects.stats(start_date, end_date)
     else:
-        warn_start_time = None
+        pageview_stats = None
+
     context = {
         'form': form,
         'track_start_time': track_start_time,
-        'warn_start_time': warn_start_time,
-        'visitor_stats': Visitor.objects.stats(start_time.date(),
-                                               end_time.date()),
+        'warn_incomplete': warn_incomplete,
         'user_stats': user_stats,
-        'tracked_dates': Visitor.objects.tracked_dates(),
+        'visitor_stats': visitor_stats,
+        'pageview_stats': pageview_stats,
     }
-
-    if TRACK_PAGEVIEWS:
-        pageview_stats = Pageview.objects.stats(start_time, end_time)
-        context['pageview_stats'] = pageview_stats
-
-    context['start_date'] = track_start_time
-    context['end_date'] = end_time
-
     return render(request, 'tracking/dashboard.html', context)

@@ -16,7 +16,7 @@
                 Visitor tracking began on
                 {{ track_start_time|date:"Y-m-d H:i:s" }}
             </p>
-            {% if warn_start_time %}
+            {% if warn_incomplete %}
             <p class=warning>
                 The start time precedes the oldest tracked visitor, thus
                 the stats are not complete for the specified range.

@@ -28,6 +28,8 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+TRACK_PAGEVIEWS = True
+
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
