@@ -80,16 +80,6 @@ class VisitorManagerTestCase(TestCase):
         }
         self.assertEqual(stats['guests'], guests)
 
-    def test_tracked_dates(self):
-        start, end = Visitor.objects.tracked_dates()
-        self.assertIsNone(start)
-        self.assertIsNone(end)
-
-        self._create_visits_and_views()
-        start, end = Visitor.objects.tracked_dates()
-        self.assertEqual(start, self.past.date())
-        self.assertEqual(end, self.future.date())
-
     def test_guests(self):
         qs = Visitor.objects.guests()
         self.assertQuerysetEqual(qs, [])

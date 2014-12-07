@@ -3,7 +3,7 @@ from __future__ import division
 from datetime import timedelta
 from django.utils import timezone
 from django.db import models
-from django.db.models import Count, Avg, Min, Max
+from django.db.models import Count, Avg
 from tracking.settings import TRACK_PAGEVIEWS, TRACK_ANONYMOUS_USERS
 from tracking.cache import CacheManager
 from .compat import User
@@ -25,18 +25,6 @@ class VisitorManager(CacheManager):
 
     def guests(self):
         return self.get_queryset().filter(user__isnull=True)
-
-    def tracked_dates(self):
-        "Returns a date range of when tracking has occured."
-        dates = self.get_queryset().aggregate(
-            start_min=Min('start_time'),
-            start_max=Max('start_time')
-        )
-        start_min = dates['start_min']
-        start_max = dates['start_max']
-        if start_min and start_max:
-            return [start_min.date(), start_max.date()]
-        return [None, None]
 
     def stats(self, start_date=None, end_date=None, registered_only=False):
         """Returns a dictionary of visits including:
