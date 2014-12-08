@@ -1,8 +1,13 @@
-from django.test import TestCase
+from datetime import timedelta
+
+from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
+from django.test import TestCase
 from django.utils.timezone import now
+
 from mock import patch
 
+from tracking.admin import VisitorAdmin
 from tracking.models import Visitor
 
 
@@ -45,3 +50,27 @@ class ViewsTestCase(TestCase):
         visitor = Visitor.objects.get()
         self.assertEqual(visitor.end_time, self.now)
         self.assertTrue(visitor.time_on_site > 0)
+
+
+class AdminViewTestCase(TestCase):
+
+    def setUp(self):
+        self.site = AdminSite()
+
+    @patch('tracking.middleware.TRACK_PAGEVIEWS', True)
+    def test_admin(self):
+        visitor = Visitor.objects.create()
+        admin = VisitorAdmin(Visitor, self.site)
+        self.assertFalse(admin.session_over(visitor))
+        visitor.expiry_time = now() - timedelta(seconds=10)
+        self.assertTrue(admin.session_over(visitor))
+        visitor.expiry_time = None
+        visitor.end_time = now()
+        self.assertTrue(admin.session_over(visitor))
+
+        time_on_site = None
+        self.assertEqual(admin.pretty_time_on_site(visitor), time_on_site)
+
+        visitor.time_on_site = 30
+        time_on_site = timedelta(seconds=30)
+        self.assertEqual(admin.pretty_time_on_site(visitor), time_on_site)
