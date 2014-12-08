@@ -15,12 +15,12 @@ class VisitorManagerTestCase(TestCase):
         self.user1 = User.objects.create_user(username='foo')
         self.user2 = User.objects.create_user(username='bar')
         self.base_time = timezone.now()
-
-    def _create_visits_and_views(self):
-        # create a visitor with visits in the past, present, and future
         self.past = self.base_time - timedelta(hours=1)
         self.present = self.base_time
         self.future = self.base_time + timedelta(days=1)
+
+    def _create_visits_and_views(self):
+        # create a visitor with visits in the past, present, and future
         kwargs = {'ip_address':  '10.0.0.1', 'user_agent': 'django',
                   'time_on_site': 30, 'expiry_time': self.future}
 
@@ -37,6 +37,22 @@ class VisitorManagerTestCase(TestCase):
         Pageview.objects.create(visitor=self.visitor1, view_time=self.future)
         Pageview.objects.create(visitor=self.visitor2, view_time=self.past)
         Pageview.objects.create(visitor=self.visitor3, view_time=self.future)
+
+    def test_only_anonymous(self):
+        # only a guest user has visited an untracked page
+        Visitor.objects.create(
+            user=None, start_time=self.base_time, session_key='A',
+            time_on_site=30)
+        stats = Visitor.objects.stats(
+            self.base_time, self.future, registered_only=True)
+        expected = {
+            'time_on_site': timedelta(seconds=30),
+            'unique': 0,
+            'total': 1,
+            'return_ratio': 100.0,
+            'pages_per_visit': 0
+        }
+        self.assertEqual(stats, expected)
 
     def test_visitor_stats(self):
         self._create_visits_and_views()
@@ -77,6 +93,27 @@ class VisitorManagerTestCase(TestCase):
             'pages_per_visit': 1.0,
         }
         self.assertEqual(stats['guests'], guests)
+
+    def test_visitor_stats_registered(self):
+        self._create_visits_and_views()
+        start_time = self.base_time - timedelta(days=1)
+        end_time = start_time + timedelta(days=3)
+        stats = Visitor.objects.stats(
+            start_time, end_time, registered_only=True)
+        self.assertEqual(stats['time_on_site'], timedelta(seconds=30))
+        self.assertEqual(stats['total'], 3)
+        self.assertEqual(stats['return_ratio'], (1 / 3) * 100)
+        self.assertEqual(stats['unique'], 2)
+        self.assertEqual(stats['pages_per_visit'], 3 / 2)
+        registered = {
+            'time_on_site': timedelta(seconds=30),
+            'unique': 2,
+            'total': 2,
+            'return_ratio': 0.0,
+            'pages_per_visit': 1.5,
+        }
+        self.assertEqual(stats['registered'], registered)
+        self.assertNotIn('guests', stats)
 
     def test_guests(self):
         qs = Visitor.objects.guests()
@@ -121,6 +158,22 @@ class VisitorManagerTestCase(TestCase):
         self.assertEqual(user.visit_count, 1)
         self.assertEqual(user.time_on_site, timedelta(seconds=30))
         self.assertEqual(user.pages_per_visit, 1)
+
+        # no start_time
+        stats = Visitor.objects.user_stats(None, end_time)
+        self.assertEqual(len(stats), 2)
+
+        user1 = stats[0]
+        self.assertEqual(user1.username, self.user1.username)
+        self.assertEqual(user1.visit_count, 1)
+        self.assertEqual(user1.time_on_site, timedelta(seconds=30))
+        self.assertEqual(user1.pages_per_visit, 2.0)
+
+        user2 = stats[1]
+        self.assertEqual(user2.username, self.user2.username)
+        self.assertEqual(user2.visit_count, 1)
+        self.assertEqual(user2.time_on_site, timedelta(seconds=30))
+        self.assertEqual(user2.pages_per_visit, 1)
 
     def test_pageview_stats(self):
         self._create_visits_and_views()
