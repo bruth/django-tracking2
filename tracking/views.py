@@ -41,8 +41,9 @@ def dashboard(request):
 
     # determine when tracking began
     try:
-        track_start_time = Visitor.objects.earliest('start_time').start_time
-    except Visitor.DoesNotExist:
+        obj = Visitor.objects.order_by('start_time')[0]
+        track_start_time = obj.start_time
+    except (IndexError, Visitor.DoesNotExist):
         track_start_time = now()
 
     # If the start_date is before tracking began, warn about incomplete data
