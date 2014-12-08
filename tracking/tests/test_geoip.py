@@ -24,18 +24,18 @@ class GeoIPTestCase(TestCase):
     def test_geoip(self):
         v = Visitor.objects.create(ip_address='64.17.254.216')
         expected = {
-            'city': u'El Segundo',
-            'continent_code': u'NA',
-            'region': u'CA',
+            'city': 'El Segundo',
+            'continent_code': 'NA',
+            'region': 'CA',
             'charset': 0,
             'area_code': 310,
             'longitude': -118.40399932861328,
-            'country_code3': u'USA',
+            'country_code3': 'USA',
             'latitude': 33.91640090942383,
-            'postal_code': u'90245',
+            'postal_code': '90245',
             'dma_code': 803,
-            'country_code': u'US',
-            'country_name': u'United States'
+            'country_code': 'US',
+            'country_name': 'United States'
         }
         self.assertEqual(v.geoip_data, expected)
         # do it again, to verify the cached version hits
