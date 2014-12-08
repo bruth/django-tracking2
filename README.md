@@ -57,6 +57,16 @@ MIDDLEWARE_CLASSES = (
 )
 ```
 
+Django 1.7
+----------
+Django 1.7 brings changes to the way database migrations are handled. If
+you do not use database migrations you should not be worried. If you use
+south and have not upgraded to django 1.7, you'll have to upgrade to
+south==1.0.
+
+With south 1.0, south-based migrations are found in the `south_migrations`
+directory while django 1.7+ migrations are in the `migrations` directory.
+
 Settings
 --------
 `TRACK_AJAX_REQUESTS` - If True, AJAX requests will be tracked. Default
