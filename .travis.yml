@@ -24,6 +24,9 @@ matrix:
         - python: "3.4"
           env: DJANGO=1.4.13
 
+before_install:
+    - sudo apt-get install libgeoip-dev
+
 install:
     - pip install -q Django==$DJANGO --use-mirrors
     - pip install geoip --use-mirrors
