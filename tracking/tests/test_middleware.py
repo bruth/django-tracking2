@@ -16,6 +16,32 @@ else:
 
 class MiddlewareTestCase(TestCase):
 
+    @patch('tracking.middleware.warnings', autospec=True)
+    def test_no_session(self, mock_warnings):
+        # ignore if session middleware is not present
+        tracking = 'tracking.middleware.VisitorTrackingMiddleware'
+        with self.settings(MIDDLEWARE_CLASSES=[tracking]):
+            self.client.get('/')
+        self.assertEqual(Visitor.objects.count(), 0)
+        self.assertEqual(Pageview.objects.count(), 0)
+        # verify warning was issued
+        msg = 'VisitorTrackingMiddleware installed withoutSessionMiddleware'
+        mock_warnings.warn.assert_called_once_with(msg, RuntimeWarning)
+
+    @patch('tracking.middleware.TRACK_AJAX_REQUESTS', False)
+    def test_no_track_ajax(self):
+        # ignore ajax-based requests
+        self.client.get('/', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(Visitor.objects.count(), 0)
+        self.assertEqual(Pageview.objects.count(), 0)
+
+    @patch('tracking.middleware.TRACK_IGNORE_STATUS_CODES', [404])
+    def test_no_track_status(self):
+        # ignore 404 pages
+        self.client.get('invalid')
+        self.assertEqual(Visitor.objects.count(), 0)
+        self.assertEqual(Pageview.objects.count(), 0)
+
     @patch('tracking.middleware.TRACK_PAGEVIEWS', False)
     def test_no_track_pageviews(self):
         # make a non PAGEVIEW tracking request
