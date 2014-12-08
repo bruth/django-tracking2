@@ -36,6 +36,10 @@ if django.get_version() < '1.6':
 TRACK_PAGEVIEWS = True
 GEOIP_PATH = os.path.join(BASE_DIR, 'geoip')
 
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, 'templates'),
+)
+
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
