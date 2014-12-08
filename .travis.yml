@@ -34,4 +34,4 @@ install:
     - python setup.py develop
 
 script:
-    - python example/manage.py test
+    - python example/manage.py test --verbosity=2
