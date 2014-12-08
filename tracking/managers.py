@@ -12,7 +12,7 @@ from .compat import User
 class VisitorManager(CacheManager):
     def active(self, registered_only=True):
         "Returns all active users, e.g. not logged and non-expired session."
-        visitors = self.get_queryset().filter(
+        visitors = self.filter(
             expiry_time__gt=timezone.now(),
             end_time=None
         )
@@ -37,7 +37,7 @@ class VisitorManager(CacheManager):
 
         for all users, registered users and guests.
         """
-        visitors = self.get_queryset().filter(
+        visitors = self.filter(
             start_time__gte=start_date,
             start_time__lt=end_date
         )
@@ -190,7 +190,7 @@ class PageviewManager(models.Manager):
 
         for all users, registered users and guests.
         """
-        pageviews = self.get_queryset().filter(
+        pageviews = self.filter(
             visitor__start_time__lt=end_date,
             visitor__start_time__gte=start_date,
         ).select_related('visitor')
