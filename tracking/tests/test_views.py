@@ -24,12 +24,29 @@ class ViewsTestCase(TestCase):
         # make a non PAGEVIEW tracking request
         response = self.client.get('/tracking/')
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['pageview_stats'],
+            {'unique': 0, 'total': 0})
+
+    @patch('tracking.views.TRACK_PAGEVIEWS', False)
+    def test_dashboard_default_no_views(self):
+        # make a non PAGEVIEW tracking request
+        response = self.client.get('/tracking/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['pageview_stats'], None)
 
     def test_dashboard_times(self):
         # make a non PAGEVIEW tracking request
         response = self.client.get(
             '/tracking/?start=2014-11&end=2014-12-01')
         self.assertEqual(response.status_code, 200)
+
+    def test_dashboard_times_bad(self):
+        # make a non PAGEVIEW tracking request
+        response = self.client.get(
+            '/tracking/?start=2014-aa&end=2014-12-01')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Enter a valid date/time.', response.content)
 
     @patch('tracking.handlers.timezone.now', autospec=True)
     def test_logout_tracking(self, mock_end):
