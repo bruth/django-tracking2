@@ -30,7 +30,7 @@ before_install:
 install:
     - pip install -q Django==$DJANGO --use-mirrors
     - pip install geoip --use-mirrors
-    - pip install mock coverage unittest2 --use-mirrors
+    - pip install coverage django-discover-runner mock unittest2 --use-mirrors
     - python setup.py develop
 
 script:

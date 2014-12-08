@@ -28,6 +28,8 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+TEST_RUNNER = 'discover_runner.DiscoverRunner'
+
 TRACK_PAGEVIEWS = True
 GEOIP_PATH = os.path.join(BASE_DIR, 'geoip')
 
