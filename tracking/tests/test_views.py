@@ -46,7 +46,7 @@ class ViewsTestCase(TestCase):
         response = self.client.get(
             '/tracking/?start=2014-aa&end=2014-12-01')
         self.assertEqual(response.status_code, 200)
-        self.assertContains('Enter a valid date/time.', response.content)
+        self.assertContains(response, 'Enter a valid date/time.')
 
     @patch('tracking.handlers.timezone.now', autospec=True)
     def test_logout_tracking(self, mock_end):
