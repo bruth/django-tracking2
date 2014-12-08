@@ -29,6 +29,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 TRACK_PAGEVIEWS = True
+GEOIP_PATH = os.path.join(BASE_DIR, 'geoip')
 
 INSTALLED_APPS = (
     'django.contrib.admin',

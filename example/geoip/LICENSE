@@ -1,0 +1,5 @@
+This directory contains a test city database from
+https://github.com/maxmind/geoip-api-python/blob/master/tests/data/.
+The code in that repository is licensed under LGPL, the data likely falls
+under a similar license. We are not using any code from that repo and the
+data is unmodified.
