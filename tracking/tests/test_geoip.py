@@ -1,10 +1,14 @@
 from os import getenv
-from unittest import skipUnless
 from django.test import TestCase
 from mock import patch
 from django.contrib.gis.geoip import HAS_GEOIP
 if HAS_GEOIP:
     from django.contrib.gis.geoip import GeoIPException
+try:
+    from unittest import skipUnless
+except ImportError:
+    # python2.6 doesn't have unittest.skip*
+    from unittest2 import skipUnless
 
 from tracking.models import Visitor
 
