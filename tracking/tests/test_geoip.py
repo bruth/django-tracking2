@@ -1,3 +1,6 @@
+import sys
+import django
+
 from os import getenv
 from django.test import TestCase
 try:
@@ -9,12 +12,16 @@ from django.contrib.gis.geoip import HAS_GEOIP
 if HAS_GEOIP:
     from django.contrib.gis.geoip import GeoIPException
 try:
-    from unittest import skipUnless
+    from unittest import skipUnless, skipIf
 except ImportError:
     # python2.6 doesn't have unittest.skip*
-    from unittest2 import skipUnless
+    from unittest2 import skipUnless, skipIf
 
 from tracking.models import Visitor
+
+# django 1.5 combined with python 3+ doesn't work, so skip it
+dj_version = django.get_version()
+broken_geoip = (dj_version[:3] == '1.5') and (sys.version_info[0] == 3)
 
 
 class GeoIPTestCase(TestCase):
@@ -23,6 +30,7 @@ class GeoIPTestCase(TestCase):
         v = Visitor.objects.create(ip_address='8.8.8.8')  # sorry Google
         self.assertEqual(v.geoip_data, None)
 
+    @skipIf(dj_version[:3] == '1.5', 'django 1.5 has GeoIP parsing issues')
     @skipUnless(getenv('CI'), 'cannot guarantee location of GeoIP data')
     @patch('tracking.models.TRACK_USING_GEOIP', True)
     def test_geoip(self):
