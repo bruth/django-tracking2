@@ -1,5 +1,6 @@
 import re
 import logging
+import warnings
 
 from django.utils import timezone
 from django.utils.encoding import smart_text
@@ -25,6 +26,9 @@ class VisitorTrackingMiddleware(object):
     def process_response(self, request, response):
         # Session framework not installed, nothing to see here..
         if not hasattr(request, 'session'):
+            msg = ('VisitorTrackingMiddleware installed without'
+                   'SessionMiddleware')
+            warnings.warn(msg, RuntimeWarning)
             return response
 
         # Do not track AJAX requests..
