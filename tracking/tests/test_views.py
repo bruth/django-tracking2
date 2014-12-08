@@ -5,7 +5,10 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.utils.timezone import now
 
-from mock import patch
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
 
 from tracking.admin import VisitorAdmin
 from tracking.models import Visitor

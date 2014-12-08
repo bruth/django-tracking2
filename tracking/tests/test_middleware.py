@@ -2,7 +2,10 @@ import re
 import sys
 
 from django.test import TestCase
-from mock import patch
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
 
 from tracking.models import Visitor, Pageview
 

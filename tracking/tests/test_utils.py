@@ -1,5 +1,8 @@
 from django.test import TestCase
-from mock import Mock
+try:
+    from unittest.mock import Mock
+except ImportError:
+    from mock import Mock
 
 from tracking.utils import (
     _is_valid_ipv4_address,

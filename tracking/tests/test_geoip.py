@@ -1,6 +1,10 @@
 from os import getenv
 from django.test import TestCase
-from mock import patch
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
+
 from django.contrib.gis.geoip import HAS_GEOIP
 if HAS_GEOIP:
     from django.contrib.gis.geoip import GeoIPException
