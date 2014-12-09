@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.utils.encoding import smart_text
 
 from tracking.models import Visitor, Pageview
-from tracking.utils import get_ip_address
+from tracking.utils import get_ip_address, total_seconds
 from tracking.settings import (
     TRACK_AJAX_REQUESTS,
     TRACK_ANONYMOUS_USERS,
@@ -83,7 +83,7 @@ class VisitorTrackingMiddleware(object):
 
         time_on_site = 0
         if visitor.start_time:
-            time_on_site = (visit_time - visitor.start_time).total_seconds()
+            time_on_site = total_seconds(visit_time - visitor.start_time)
         visitor.time_on_site = int(time_on_site)
 
         visitor.save()
