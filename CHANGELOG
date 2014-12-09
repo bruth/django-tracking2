@@ -1,3 +1,10 @@
+2014-12-08  Michael J. Schultz  <mjschultz@gmail.com>
+
+    * Add tests to existing codebase with minor bugfixes
+    * Change /dashboard/ view to include past 7 days by default (#20, #28)
+    * Improve timezone support by removing `.date()` calls (#39)
+    * Increase scope of `TRACK_IGNORE_URLS` beyond Pageview tracking (#45)
+
 2013-11-07  Byron Ruth  <b@devel.io>
 
     * Add PageView.method field for tracking the request method used
