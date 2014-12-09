@@ -8,3 +8,10 @@ omit =
   setup.py
   example/*
   tracking/migrations/*
+  tracking/south_migrations/*
+  tracking/compat.py
+  tracking/tests/*
+
+exclude_lines =
+  # versioning is for packaging routines
+  def get_version

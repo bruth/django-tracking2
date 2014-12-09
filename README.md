@@ -1,6 +1,7 @@
 Overview
 ========
 
+[![Build Status](https://travis-ci.org/bruth/django-tracking2.svg?branch=master)](https://travis-ci.org/bruth/django-tracking2)
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/bruth/django-tracking2/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 django-tracking2 tracks the length of time visitors and registered users
@@ -56,6 +57,16 @@ MIDDLEWARE_CLASSES = (
 )
 ```
 
+Django 1.7
+----------
+Django 1.7 brings changes to the way database migrations are handled. If
+you do not use database migrations you should not be worried. If you use
+south and have not upgraded to django 1.7, you'll have to upgrade to
+south==1.0.
+
+With south 1.0, south-based migrations are found in the `south_migrations`
+directory while django 1.7+ migrations are in the `migrations` directory.
+
 Settings
 --------
 `TRACK_AJAX_REQUESTS` - If True, AJAX requests will be tracked. Default
@@ -74,8 +85,8 @@ since they should be served up statically Django's static serve view or via
 a lightweight server in production. Read more
 [here](https://docs.djangoproject.com/en/dev/howto/static-files/#serving-other-directories)
 
-`TRACK_IGNORE_STATUS_CODES` - A list of HttpResponse status_codes that will be ignored.
-If the HttpResponse object has a status_code in this blacklist, the pageview record 
+`TRACK_IGNORE_STATUS_CODES` - A list of HttpResponse status codes that will be ignored.
+If the HttpResponse object has a `status_code` in this blacklist, the pageview record 
 will not be saved. For example,
 
 ```python
@@ -106,7 +117,8 @@ Thus only superusers and users granted this permission can view these pages.
 
 Available URLs
 --------------
-* `/dashboard/` - overview of all visitor activity
+* `/` - overview of all visitor activity, includes a time picker for
+        filtering.
 
 Templates
 ---------

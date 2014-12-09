@@ -1,4 +1,3 @@
-from datetime import datetime
 from django.utils import timezone
 from django.core.cache import cache
 from django.conf import settings
@@ -6,6 +5,7 @@ from tracking.models import Visitor
 from tracking.cache import instance_cache_key
 
 SESSION_COOKIE_AGE = getattr(settings, 'SESSION_COOKIE_AGE')
+
 
 def track_ended_session(sender, request, user, **kwargs):
     try:
@@ -22,6 +22,7 @@ def track_ended_session(sender, request, user, **kwargs):
     # Unset the cache since the user logged out, this particular visitor will
     # unlikely be accessed individually.
     cache.delete(instance_cache_key(visitor))
+
 
 def post_save_cache(sender, instance, **kwargs):
     cache.set(instance_cache_key(instance), instance, SESSION_COOKIE_AGE)

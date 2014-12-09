@@ -8,6 +8,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
+import django
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -27,6 +29,16 @@ TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = []
 
 # Application definition
+
+if django.get_version() < '1.6':
+    TEST_RUNNER = 'discover_runner.DiscoverRunner'
+
+TRACK_PAGEVIEWS = True
+GEOIP_PATH = os.path.join(BASE_DIR, 'geoip')
+
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, 'templates'),
+)
 
 INSTALLED_APPS = (
     'django.contrib.admin',

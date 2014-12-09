@@ -1,5 +1,5 @@
 import logging
-import traceback
+
 from django.utils import timezone
 from django.contrib.gis.geoip import HAS_GEOIP
 if HAS_GEOIP:
@@ -56,7 +56,9 @@ class Visitor(models.Model):
                 gip = GeoIP(cache=GEOIP_CACHE_TYPE)
                 self._geoip_data = gip.city(self.ip_address)
             except GeoIPException:
-                log.error('Error getting GeoIP data for IP "%s": %s' % (self.ip_address, traceback.format_exc()))
+                msg = 'Error getting GeoIP data for IP "{0}"'.format(
+                    self.ip_address)
+                log.exception(msg)
 
         return self._geoip_data
 

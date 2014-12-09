@@ -1,101 +1,68 @@
 import logging
-import calendar
 
-from warnings import warn
-from datetime import datetime, time
-from datetime import date
+from datetime import timedelta
+
+from django import forms
 from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
 from django.utils.timezone import now
+
 from tracking.models import Visitor, Pageview
 from tracking.settings import TRACK_PAGEVIEWS
 
 log = logging.getLogger(__file__)
 
+# tracking wants to accept more formats than default, here they are
+input_formats = [
+    '%Y-%m-%d %H:%M:%S',    # '2006-10-25 14:30:59'
+    '%Y-%m-%d %H:%M',       # '2006-10-25 14:30'
+    '%Y-%m-%d',             # '2006-10-25'
+    '%Y-%m',                # '2006-10'
+    '%Y',                   # '2006'
+]
 
-def parse_partial_date(date_str, upper=False):
-    if not date_str:
-        return
 
-    day = None
-    toks = [int(x) for x in date_str.split('-')]
-
-    if len(toks) > 3:
-        return None
-
-    if len(toks) == 3:
-        year, month, day = toks
-    # Nissing day
-    elif len(toks) == 2:
-        year, month = toks
-    # Only year
-    elif len(toks) == 1:
-        year, = toks
-        month = 1 if upper else 12
-
-    if not day:
-        day = calendar.monthrange(year, month)[0] if upper else 1
-
-    return date(year, month, day)
+class DashboardForm(forms.Form):
+    start = forms.DateTimeField(required=False, input_formats=input_formats)
+    end = forms.DateTimeField(required=False, input_formats=input_formats)
 
 
 @permission_required('tracking.view_visitor')
 def dashboard(request):
     "Counts, aggregations and more!"
-    errors = []
-    start_date, end_date = None, None
-    err_message = '<code>{value}</code> is not a valid {field}'
+    end_time = now()
+    start_time = end_time - timedelta(days=7)
+    defaults = {'start': start_time, 'end': end_time}
 
-    # get the dates of the request
-    start_str = request.GET.get('start', None)
-    end_str = request.GET.get('end', None)
+    form = DashboardForm(data=request.GET or defaults)
+    if form.is_valid():
+        start_time = form.cleaned_data['start']
+        end_time = form.cleaned_data['end']
 
+    # determine when tracking began
     try:
-        start_date = parse_partial_date(start_str)
-    except (ValueError, TypeError):
-        errors.append(err_message.format(value=start_str, field='start date'))
-
-    try:
-        end_date = parse_partial_date(end_str, upper=True)
-    except (ValueError, TypeError):
-        errors.append(err_message.format(value=start_str, field='end date'))
-
-    user_stats = list(Visitor.objects.user_stats(start_date, end_date))
-
-    try:
-        track_start_time = Visitor.objects.latest('start_time').start_time
-    except Visitor.DoesNotExist:
+        obj = Visitor.objects.order_by('start_time')[0]
+        track_start_time = obj.start_time
+    except (IndexError, Visitor.DoesNotExist):
         track_start_time = now()
 
-    # If the start_date is later than when tracking began, no reason
-    # to warn about missing data
-    if start_date and calendar.timegm(start_date.timetuple()) < calendar.timegm(track_start_time.timetuple()):
-        warn_start_time = track_start_time
-    else:
-        warn_start_time = None
-    context = {
-        'errors': errors,
-        'track_start_time': track_start_time,
-        'warn_start_time': warn_start_time,
-        'visitor_stats': Visitor.objects.stats(start_date, end_date),
-        'user_stats': user_stats,
-        'tracked_dates': Visitor.objects.tracked_dates(),
-    }
+    # If the start_date is before tracking began, warn about incomplete data
+    warn_incomplete = (start_time < track_start_time)
 
+    # queries take `date` objects (for now)
+    user_stats = Visitor.objects.user_stats(start_time, end_time)
+    visitor_stats = Visitor.objects.stats(start_time, end_time)
     if TRACK_PAGEVIEWS:
-        context['pageview_stats'] = Pageview.objects.stats(start_date, end_date)
-    if not end_date:
-        context['end_date'] = now()
+        pageview_stats = Pageview.objects.stats(start_time, end_time)
     else:
-        context['end_date'] = end_date
-    if not start_date:
-        context['start_date'] = track_start_time
-    else:
-        context['start_date'] = datetime.combine(start_date, time.min)
+        pageview_stats = None
 
+    context = {
+        'form': form,
+        'track_start_time': track_start_time,
+        'warn_incomplete': warn_incomplete,
+        'user_stats': user_stats,
+        'visitor_stats': visitor_stats,
+        'pageview_stats': pageview_stats,
+    }
     return render(request, 'tracking/dashboard.html', context)
-
-
-def stats(*args, **kwargs):
-    warn('The stats view has been renamed to dashboard and the /dashboard/ URL has be moved to the root /', DeprecationWarning)
-    return dashboard(*args, **kwargs)

@@ -8,9 +8,9 @@ python:
     - "3.4"
 
 env:
-    - DJANGO=1.4.13
-    - DJANGO=1.5.8
-    - DJANGO=1.6.5
+    - DJANGO=1.4.16
+    - DJANGO=1.5.11
+    - DJANGO=1.6.8
     - DJANGO=1.7.1
 
 matrix:
@@ -18,16 +18,20 @@ matrix:
         - python: "2.6"
           env: DJANGO=1.7.1
         - python: "3.2"
-          env: DJANGO=1.4.13
+          env: DJANGO=1.4.16
         - python: "3.3"
-          env: DJANGO=1.4.13
+          env: DJANGO=1.4.16
         - python: "3.4"
-          env: DJANGO=1.4.13
+          env: DJANGO=1.4.16
+
+before_install:
+    - sudo apt-get install libgeoip-dev
 
 install:
     - pip install -q Django==$DJANGO --use-mirrors
-    - pip install mock coverage
+    - pip install geoip --use-mirrors
+    - pip install coverage django-discover-runner mock unittest2 --use-mirrors
     - python setup.py develop
 
 script:
-    - python example/manage.py test
+    - python example/manage.py test --verbosity=2
