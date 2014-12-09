@@ -43,6 +43,12 @@ class VisitorTrackingMiddleware(object):
         if user is None and not TRACK_ANONYMOUS_USERS:
             return False
 
+        # Do not track ignored urls
+        path = request.path_info.lstrip('/')
+        for url in track_ignore_urls:
+            if url.match(path):
+                return False
+
         # everything says we should track this hit
         return True
 
@@ -125,12 +131,6 @@ class VisitorTrackingMiddleware(object):
         visitor = self._refresh_visitor(user, request, now)
 
         if TRACK_PAGEVIEWS:
-            # Do not track ignored urls
-            path = request.path_info.lstrip('/')
-            for url in track_ignore_urls:
-                if url.match(path):
-                    break
-            else:
-                self._add_pageview(visitor, request, now)
+            self._add_pageview(visitor, request, now)
 
         return response
