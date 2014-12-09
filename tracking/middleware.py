@@ -23,52 +23,40 @@ log = logging.getLogger(__file__)
 
 
 class VisitorTrackingMiddleware(object):
-    def process_response(self, request, response):
+    def _should_track(self, user, request, response):
         # Session framework not installed, nothing to see here..
         if not hasattr(request, 'session'):
             msg = ('VisitorTrackingMiddleware installed without'
                    'SessionMiddleware')
             warnings.warn(msg, RuntimeWarning)
-            return response
+            return False
 
-        # Do not track AJAX requests..
+        # Do not track AJAX requests
         if request.is_ajax() and not TRACK_AJAX_REQUESTS:
-            return response
+            return False
 
         # Do not track if HTTP HttpResponse status_code blacklisted
         if response.status_code in TRACK_IGNORE_STATUS_CODES:
-            return response
+            return False
 
-        # If dealing with a non-authenticated user, we still should track the
-        # session since if authentication happens, the `session_key` carries
-        # over, thus having a more accurate start time of session
-        user = getattr(request, 'user', None)
+        # Do not tracking anonymous users if set
+        if user is None and not TRACK_ANONYMOUS_USERS:
+            return False
 
-        # Check for anonymous users
-        if not user or user.is_anonymous():
-            if not TRACK_ANONYMOUS_USERS:
-                return response
-            user = None
+        # everything says we should track this hit
+        return True
 
-        # Force a save to generate a session key if one does not exist
-        if not request.session.session_key:
-            request.session.save()
-
+    def _refresh_visitor(self, user, request, visit_time):
         # A Visitor row is unique by session_key
         session_key = request.session.session_key
 
         try:
             visitor = Visitor.objects.get(pk=session_key)
         except Visitor.DoesNotExist:
-            visitor_user_agent = request.META.get('HTTP_USER_AGENT', None)
-            if visitor_user_agent is not None:
-                visitor_user_agent = smart_text(
-                    visitor_user_agent, encoding='latin-1', errors='ignore')
-            # Log the ip address. Start time is managed via the
-            # field `default` value
-            visitor = Visitor(
-                pk=session_key, ip_address=get_ip_address(request),
-                user_agent=visitor_user_agent)
+            # Log the ip address. Start time is managed via the field
+            # `default` value
+            ip_address = get_ip_address(request)
+            visitor = Visitor(pk=session_key, ip_address=ip_address)
 
         # Update the user field if the visitor user is not set. This
         # implies authentication has occured on this request and now
@@ -77,40 +65,72 @@ class VisitorTrackingMiddleware(object):
         if user and not visitor.user_id:
             visitor.user = user
 
+        # update some session expiration details
         visitor.expiry_age = request.session.get_expiry_age()
         visitor.expiry_time = request.session.get_expiry_date()
+
+        # grab the latest User-Agent and store it
+        user_agent = request.META.get('HTTP_USER_AGENT', None)
+        if user_agent:
+            visitor.user_agent = smart_text(
+                user_agent, encoding='latin-1', errors='ignore')
+
+        time_on_site = 0
+        if visitor.start_time:
+            time_on_site = (visit_time - visitor.start_time).total_seconds()
+        visitor.time_on_site = int(time_on_site)
+
+        visitor.save()
+        return visitor
+
+    def _add_pageview(self, visitor, request, view_time):
+        referer = None
+        query_string = None
+
+        if TRACK_REFERER:
+            referer = request.META.get('HTTP_REFERER', None)
+
+        if TRACK_QUERY_STRING:
+            query_string = request.META.get('QUERY_STRING')
+
+        pageview = Pageview(
+            visitor=visitor, url=request.path, view_time=view_time,
+            method=request.method, referer=referer,
+            query_string=query_string)
+        pageview.save()
+
+    def process_response(self, request, response):
+        # If dealing with a non-authenticated user, we still should track the
+        # session since if authentication happens, the `session_key` carries
+        # over, thus having a more accurate start time of session
+        user = getattr(request, 'user', None)
+        if user and user.is_anonymous():
+            # set AnonymousUsers to None for simplicity
+            user = None
+
+        # make sure this is a response we want to track
+        if not self._should_track(user, request, response):
+            return response
+
+        # Force a save to generate a session key if one does not exist
+        if not request.session.session_key:
+            request.session.save()
 
         # Be conservative with the determining time on site since simply
         # increasing the session timeout could greatly skew results. This
         # is the only time we can guarantee.
         now = timezone.now()
-        time_on_site = 0
-        if visitor.start_time:
-            time_on_site = (now - visitor.start_time).seconds
-        visitor.time_on_site = time_on_site
 
-        visitor.save()
+        # update/create the visitor object for this request
+        visitor = self._refresh_visitor(user, request, now)
 
         if TRACK_PAGEVIEWS:
-            # Match against `path_info` to not include the SCRIPT_NAME..
+            # Do not track ignored urls
             path = request.path_info.lstrip('/')
             for url in track_ignore_urls:
                 if url.match(path):
                     break
             else:
-                referer = None
-                query_string = None
-
-                if TRACK_REFERER:
-                    referer = request.META.get('HTTP_REFERER', None)
-
-                if TRACK_QUERY_STRING:
-                    query_string = request.META.get('QUERY_STRING')
-
-                pageview = Pageview(
-                    visitor=visitor, url=request.path, view_time=now,
-                    method=request.method, referer=referer,
-                    query_string=query_string)
-                pageview.save()
+                self._add_pageview(visitor, request, now)
 
         return response
