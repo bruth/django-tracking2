@@ -1,3 +1,5 @@
+from __future__ import division
+
 import socket
 
 headers = (
@@ -32,3 +34,8 @@ def get_ip_address(request):
             ip = request.META[header].split(',')[0]
             if _is_valid_ipv6_address(ip) or _is_valid_ipv4_address(ip):
                 return ip
+
+
+def total_seconds(delta):
+    day_seconds = (delta.days * 24 * 3600) + delta.seconds
+    return (delta.microseconds + day_seconds * 10**6) / 10**6

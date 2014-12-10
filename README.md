@@ -79,10 +79,10 @@ Default is True
 
 `TRACK_IGNORE_URLS` - A list of regular expressions that will be matched
 against the `request.path_info` (`request.path` is stored, but not matched
-against). If they are matched, the pageview record will not be saved. Default
-includes 'favicon.ico' and 'robots.txt'. Note, static and media are not included
-since they should be served up statically Django's static serve view or via
-a lightweight server in production. Read more
+against). If they are matched, the visitor (and pageview) record will not
+be saved. Default includes 'favicon.ico' and 'robots.txt'. Note, static and
+media are not included since they should be served up statically Django's
+static serve view or via a lightweight server in production. Read more
 [here](https://docs.djangoproject.com/en/dev/howto/static-files/#serving-other-directories)
 
 `TRACK_IGNORE_STATUS_CODES` - A list of HttpResponse status codes that will be ignored.

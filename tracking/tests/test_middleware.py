@@ -76,14 +76,13 @@ class MiddlewareTestCase(TestCase):
         self.assertEqual(Visitor.objects.count(), 0)
         self.assertEqual(Pageview.objects.count(), 0)
 
-    @patch('tracking.middleware.TRACK_PAGEVIEWS', True)
-    def test_track_pageviews_ignore_url(self):
+    def test_track_ignore_url(self):
         ignore_urls = [re.compile('foo')]
         with patch('tracking.middleware.track_ignore_urls', ignore_urls):
             self.client.get('/')
             self.client.get('/foo/')
-        # Vistor is still tracked, but page is not (in second case
-        self.assertEqual(Visitor.objects.count(), 2)
+        # tracking turns a blind eye towards ignore_urls, no visitor, no view
+        self.assertEqual(Visitor.objects.count(), 1)
         self.assertEqual(Pageview.objects.count(), 1)
 
     @patch('tracking.middleware.TRACK_PAGEVIEWS', True)
