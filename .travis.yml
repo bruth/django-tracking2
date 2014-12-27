@@ -28,9 +28,9 @@ before_install:
     - sudo apt-get install libgeoip-dev
 
 install:
-    - pip install -q Django==$DJANGO --use-mirrors
-    - pip install geoip --use-mirrors
-    - pip install coverage django-discover-runner mock unittest2 --use-mirrors
+    - pip install -q Django==$DJANGO
+    - pip install geoip
+    - pip install coverage django-discover-runner mock unittest2
     - python setup.py develop
 
 script:
