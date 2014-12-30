@@ -1,3 +1,9 @@
+2014-12-27	Byron Ruth	<b@devel.io>
+
+	* Replace IP validation with Django's built-in validators. This also
+	removes a Windows-specific issue of not having the `socket.inet_aton`
+	function. (#48, #47)
+
 2014-12-08  Michael J. Schultz  <mjschultz@gmail.com>
 
     * Add tests to existing codebase with minor bugfixes
