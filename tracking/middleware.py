@@ -70,7 +70,7 @@ class VisitorTrackingMiddleware(object):
         # the user is object exists. Check using `user_id` to prevent
         # a database hit.
         if user and not visitor.user_id:
-            visitor.user = user
+            visitor.user_id = user.id
 
         # update some session expiration details
         visitor.expiry_age = request.session.get_expiry_age()
