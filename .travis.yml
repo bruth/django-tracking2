@@ -1,5 +1,7 @@
 language: python
 
+sudo: false
+
 python:
     - "2.6"
     - "2.7"
@@ -25,8 +27,10 @@ matrix:
         - python: "3.4"
           env: DJANGO="Django>=1.4,<1.5"
 
-before_install:
-    - sudo apt-get install libgeoip-dev
+addons:
+    apt:
+        packages:
+        - libgeoip-dev
 
 install:
     - pip install -q $DJANGO
