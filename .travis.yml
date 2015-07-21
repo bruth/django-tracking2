@@ -33,9 +33,10 @@ addons:
         - libgeoip-dev
 
 install:
-    - pip install -q $DJANGO
+    - pip install "$DJANGO"
     - pip install geoip
     - pip install coverage django-discover-runner mock unittest2
+    - pip freeze
     - python setup.py develop
 
 script:
