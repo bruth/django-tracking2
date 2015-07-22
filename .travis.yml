@@ -1,5 +1,7 @@
 language: python
 
+sudo: false
+
 python:
     - "2.6"
     - "2.7"
@@ -8,29 +10,33 @@ python:
     - "3.4"
 
 env:
-    - DJANGO=1.4.16
-    - DJANGO=1.5.11
-    - DJANGO=1.6.8
-    - DJANGO=1.7.1
+    - DJANGO="Django>=1.4,<1.5"
+    - DJANGO="Django>=1.7,<1.8"
+    - DJANGO="Django>=1.8,<1.9"
 
 matrix:
     exclude:
         - python: "2.6"
-          env: DJANGO=1.7.1
+          env: DJANGO="Django>=1.7,<1.8"
+        - python: "2.6"
+          env: DJANGO="Django>=1.8,<1.9"
         - python: "3.2"
-          env: DJANGO=1.4.16
+          env: DJANGO="Django>=1.4,<1.5"
         - python: "3.3"
-          env: DJANGO=1.4.16
+          env: DJANGO="Django>=1.4,<1.5"
         - python: "3.4"
-          env: DJANGO=1.4.16
+          env: DJANGO="Django>=1.4,<1.5"
 
-before_install:
-    - sudo apt-get install libgeoip-dev
+addons:
+    apt:
+        packages:
+        - libgeoip-dev
 
 install:
-    - pip install -q Django==$DJANGO
+    - pip install "$DJANGO"
     - pip install geoip
     - pip install coverage django-discover-runner mock unittest2
+    - pip freeze
     - python setup.py develop
 
 script:
