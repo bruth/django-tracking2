@@ -1,3 +1,12 @@
+2015-07-22	Michael J. Schultz	<mjschultz@gmail.com>
+
+	* Add continuous integration (CI) tests for Django 1.8
+	* Drop CI tests for Django 1.5 and 1.6
+
+2015-07-10  Michael J. Schultz  <mjschultz@gmail.com>
+
+	* Handle race condition when saving visitor in middleware.
+
 2014-12-27	Byron Ruth	<b@devel.io>
 
 	* Replace IP validation with Django's built-in validators. This also
