@@ -5,7 +5,7 @@ kwargs = {
         exclude=['tests', '*.tests', '*.tests.*', 'tests.*']),
     'include_package_data': True,
     'install_requires': [
-        'django>=1.4',
+        'django>=1.5',
     ],
     'name': 'django-tracking2',
     'version': __import__('tracking').get_version(),
@@ -17,7 +17,7 @@ kwargs = {
     'keywords': 'visitor tracking time analytics',
     'url': 'https://github.com/bruth/django-tracking2',
     'classifiers': [
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Framework :: Django',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
