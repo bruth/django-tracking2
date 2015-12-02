@@ -87,16 +87,16 @@ class VisitorTrackingMiddleware(object):
             time_on_site = total_seconds(visit_time - visitor.start_time)
         visitor.time_on_site = int(time_on_site)
 
-        with transaction.atomic():
-            try:
+        try:
+            with transaction.atomic():
                 visitor.save()
-            except IntegrityError:
-                # there is a small chance a second response has saved this
-                # Visitor already and a second save() at the same time (having
-                # failed to UPDATE anything) will attempt to INSERT the same
-                # session key (pk) again causing an IntegrityError
-                # If this happens we'll just grab the "winner" and use that!
-                visitor = Visitor.objects.get(pk=session_key)
+        except IntegrityError:
+            # there is a small chance a second response has saved this
+            # Visitor already and a second save() at the same time (having
+            # failed to UPDATE anything) will attempt to INSERT the same
+            # session key (pk) again causing an IntegrityError
+            # If this happens we'll just grab the "winner" and use that!
+            visitor = Visitor.objects.get(pk=session_key)
 
         return visitor
 
