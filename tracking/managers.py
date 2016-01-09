@@ -2,11 +2,11 @@ from __future__ import division
 
 from datetime import timedelta
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Count, Avg
 from tracking.settings import TRACK_PAGEVIEWS, TRACK_ANONYMOUS_USERS
 from tracking.cache import CacheManager
-from .compat import User
 
 
 class VisitorManager(CacheManager):
@@ -164,7 +164,7 @@ class VisitorManager(CacheManager):
             user_kwargs['visit_history__start_time__isnull'] = False
             visit_kwargs['start_time__isnull'] = False
 
-        users = list(User.objects.filter(**user_kwargs).annotate(
+        users = list(get_user_model().objects.filter(**user_kwargs).annotate(
             visit_count=Count('visit_history'),
             time_on_site=Avg('visit_history__time_on_site'),
         ).filter(visit_count__gt=0).order_by('-time_on_site'))
