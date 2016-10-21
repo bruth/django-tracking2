@@ -2,7 +2,7 @@ import re
 import logging
 import warnings
 
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.utils import timezone
 from django.utils.encoding import smart_text
 
@@ -88,7 +88,8 @@ class VisitorTrackingMiddleware(object):
         visitor.time_on_site = int(time_on_site)
 
         try:
-            visitor.save()
+            with transaction.atomic():
+                visitor.save()
         except IntegrityError:
             # there is a small chance a second response has saved this
             # Visitor already and a second save() at the same time (having
