@@ -53,7 +53,7 @@ class VisitorTrackingMiddleware(object):
                 return False
 
         # Do not track ignored user agents
-        user_agent = request.META.get('HTTP_USER_AGENT', None)
+        user_agent = request.META.get('HTTP_USER_AGENT', '')
         for user_agent_pattern in track_ignore_user_agents:
             if user_agent_pattern.match(user_agent):
                 return False
