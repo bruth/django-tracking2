@@ -9,6 +9,8 @@ TRACK_IGNORE_URLS = getattr(settings, 'TRACK_IGNORE_URLS', (
     r'^(favicon\.ico|robots\.txt)$',
 ))
 
+TRACK_IGNORE_USER_AGENTS = getattr(settings, 'TRACK_IGNORE_USER_AGENTS', tuple())
+
 TRACK_IGNORE_STATUS_CODES = getattr(settings, 'TRACK_IGNORE_STATUS_CODES', [])
 
 TRACK_USING_GEOIP = getattr(settings, 'TRACK_USING_GEOIP', False)

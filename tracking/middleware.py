@@ -13,12 +13,14 @@ from tracking.settings import (
     TRACK_ANONYMOUS_USERS,
     TRACK_IGNORE_STATUS_CODES,
     TRACK_IGNORE_URLS,
+    TRACK_IGNORE_USER_AGENTS,
     TRACK_PAGEVIEWS,
     TRACK_QUERY_STRING,
     TRACK_REFERER,
 )
 
 track_ignore_urls = [re.compile(x) for x in TRACK_IGNORE_URLS]
+track_ignore_user_agents = [re.compile(x, re.IGNORECASE) for x in TRACK_IGNORE_USER_AGENTS]
 
 log = logging.getLogger(__file__)
 
@@ -48,6 +50,12 @@ class VisitorTrackingMiddleware(object):
         path = request.path_info.lstrip('/')
         for url in track_ignore_urls:
             if url.match(path):
+                return False
+
+        # Do not track ignored user agents
+        user_agent = request.META.get('HTTP_USER_AGENT', None)
+        for user_agent_pattern in track_ignore_user_agents:
+            if user_agent_pattern.match(user_agent):
                 return False
 
         # everything says we should track this hit
