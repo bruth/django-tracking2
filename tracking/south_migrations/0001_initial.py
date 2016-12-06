@@ -3,18 +3,17 @@ import datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
-
-from tracking.compat import User
+from django.conf import settings
 
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
+
         # Adding model 'Visitor'
         db.create_table('tracking_visitor', (
             ('session_key', self.gf('django.db.models.fields.CharField')(max_length=40, primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='visit_history', null=True, to=User)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='visit_history', null=True, to=settings.AUTH_USER_MODEL)),
             ('ip_address', self.gf('django.db.models.fields.CharField')(max_length=39)),
             ('user_agent', self.gf('django.db.models.fields.TextField')()),
             ('start_time', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
@@ -25,7 +24,7 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        
+
         # Deleting model 'Visitor'
         db.delete_table('tracking_visitor')
 
