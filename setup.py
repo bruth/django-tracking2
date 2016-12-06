@@ -5,7 +5,7 @@ kwargs = {
         exclude=['tests', '*.tests', '*.tests.*', 'tests.*']),
     'include_package_data': True,
     'install_requires': [
-        'django>=1.6',
+        'django>=1.7',
     ],
     'name': 'django-tracking2',
     'version': __import__('tracking').get_version(),
@@ -23,9 +23,7 @@ kwargs = {
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Topic :: Internet :: WWW/HTTP',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
     ],
