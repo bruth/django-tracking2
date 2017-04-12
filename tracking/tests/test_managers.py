@@ -163,13 +163,13 @@ class VisitorManagerTestCase(TestCase):
         stats = Visitor.objects.user_stats(None, end_time)
         self.assertEqual(len(stats), 2)
 
-        user1 = stats[0]
+        user1 = stats[1]
         self.assertEqual(user1.username, self.user1.username)
         self.assertEqual(user1.visit_count, 1)
         self.assertEqual(user1.time_on_site, timedelta(seconds=30))
         self.assertEqual(user1.pages_per_visit, 2.0)
 
-        user2 = stats[1]
+        user2 = stats[0]
         self.assertEqual(user2.username, self.user2.username)
         self.assertEqual(user2.visit_count, 1)
         self.assertEqual(user2.time_on_site, timedelta(seconds=30))
