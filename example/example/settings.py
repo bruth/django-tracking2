@@ -24,8 +24,6 @@ SECRET_KEY = '6!9cxt&$5a3bz-*xf(l$r4(z24pxyytf0aksfb_kt^b$1kq^4g'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-TEMPLATE_DEBUG = True
-
 ALLOWED_HOSTS = []
 
 # Application definition
@@ -36,9 +34,12 @@ if django.get_version() < '1.6':
 TRACK_PAGEVIEWS = True
 GEOIP_PATH = os.path.join(BASE_DIR, 'geoip')
 
-TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'templates'),
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+    }
+]
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -60,6 +61,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
