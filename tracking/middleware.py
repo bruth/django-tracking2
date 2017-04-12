@@ -4,8 +4,11 @@ import warnings
 
 from django.db import IntegrityError, transaction
 from django.utils import timezone
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import smart_text
+try:
+    from django.utils.deprecation import MiddlewareMixin
+except ImportError:
+    MiddlewareMixin = object
 
 from tracking.models import Visitor, Pageview
 from tracking.utils import get_ip_address, total_seconds

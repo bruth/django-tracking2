@@ -1,6 +1,7 @@
 import re
 import sys
 
+import django
 from django.test import TestCase
 try:
     from unittest.mock import patch
@@ -16,6 +17,8 @@ else:
     def _u(s):
         return unicode(s)
 
+OLD_VERSION = django.VERSION < (1, 10)
+
 
 class MiddlewareTestCase(TestCase):
 
@@ -23,7 +26,8 @@ class MiddlewareTestCase(TestCase):
     def test_no_session(self, mock_warnings):
         # ignore if session middleware is not present
         tracking = 'tracking.middleware.VisitorTrackingMiddleware'
-        with self.settings(MIDDLEWARE=[tracking]):
+        middleware = 'MIDDLEWARE_CLASSES' if OLD_VERSION else 'MIDDLEWARE'
+        with self.settings(**{middleware: [tracking]}):
             self.client.get('/')
         self.assertEqual(Visitor.objects.count(), 0)
         self.assertEqual(Pageview.objects.count(), 0)
