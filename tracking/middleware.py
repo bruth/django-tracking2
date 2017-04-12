@@ -4,6 +4,7 @@ import warnings
 
 from django.db import IntegrityError, transaction
 from django.utils import timezone
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import smart_text
 
 from tracking.models import Visitor, Pageview
@@ -20,12 +21,14 @@ from tracking.settings import (
 )
 
 track_ignore_urls = [re.compile(x) for x in TRACK_IGNORE_URLS]
-track_ignore_user_agents = [re.compile(x, re.IGNORECASE) for x in TRACK_IGNORE_USER_AGENTS]
+track_ignore_user_agents = [
+    re.compile(x, re.IGNORECASE) for x in TRACK_IGNORE_USER_AGENTS
+]
 
 log = logging.getLogger(__file__)
 
 
-class VisitorTrackingMiddleware(object):
+class VisitorTrackingMiddleware(MiddlewareMixin):
     def _should_track(self, user, request, response):
         # Session framework not installed, nothing to see here..
         if not hasattr(request, 'session'):

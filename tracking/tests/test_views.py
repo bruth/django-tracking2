@@ -11,16 +11,10 @@ try:
 except ImportError:
     from mock import patch
 
-try:
-    from unittest import skipIf
-except ImportError:
-    # python2.6 doesn't have unittest.skip*
-    from unittest2 import skipIf
-
 from tracking.admin import VisitorAdmin
 from tracking.models import Visitor
 
-dj_version = django.get_version()
+dj_version = django.VERSION
 
 
 class ViewsTestCase(TestCase):
@@ -60,7 +54,6 @@ class ViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Enter a valid date/time.')
 
-    @skipIf(dj_version < '1.6', 'django < 1.6 test client does not logout')
     @patch('tracking.handlers.timezone.now', autospec=True)
     def test_logout_tracking(self, mock_end):
         # logout should call post-logout signal

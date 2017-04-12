@@ -28,9 +28,6 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-if django.get_version() < '1.6':
-    TEST_RUNNER = 'discover_runner.DiscoverRunner'
-
 TRACK_PAGEVIEWS = True
 GEOIP_PATH = os.path.join(BASE_DIR, 'geoip')
 
@@ -65,6 +62,19 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
+MIDDLEWARE = [
+    # make sure tracking middleware is before SessionMiddleware
+    'tracking.middleware.VisitorTrackingMiddleware',
+
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
 
 ROOT_URLCONF = 'example.urls'
 
