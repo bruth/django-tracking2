@@ -18,9 +18,13 @@ log = logging.getLogger(__file__)
 
 class Visitor(models.Model):
     session_key = models.CharField(max_length=40, primary_key=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             related_name='visit_history', null=True,
-                             editable=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='visit_history',
+        null=True,
+        editable=False,
+        on_delete=models.CASCADE,
+    )
     # Update to GenericIPAddress in Django 1.4
     ip_address = models.CharField(max_length=39, editable=False)
     user_agent = models.TextField(null=True, editable=False)
@@ -70,7 +74,11 @@ class Visitor(models.Model):
 
 
 class Pageview(models.Model):
-    visitor = models.ForeignKey(Visitor, related_name='pageviews')
+    visitor = models.ForeignKey(
+        Visitor,
+        related_name='pageviews',
+        on_delete=models.CASCADE,
+    )
     url = models.TextField(null=False, editable=False)
     referer = models.TextField(null=True, editable=False)
     query_string = models.TextField(null=True, editable=False)
