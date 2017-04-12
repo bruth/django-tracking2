@@ -1,6 +1,5 @@
 from datetime import timedelta
 
-import django
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -13,8 +12,6 @@ except ImportError:
 
 from tracking.admin import VisitorAdmin
 from tracking.models import Visitor
-
-dj_version = django.VERSION
 
 
 class ViewsTestCase(TestCase):
