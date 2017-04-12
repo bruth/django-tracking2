@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 ('expiry_time', models.DateTimeField(null=True, editable=False)),
                 ('time_on_site', models.IntegerField(null=True, editable=False)),
                 ('end_time', models.DateTimeField(null=True, editable=False)),
-                ('user', models.ForeignKey(related_name='visit_history', editable=False, to=settings.AUTH_USER_MODEL, null=True)),
+                ('user', models.ForeignKey(related_name='visit_history', editable=False, to=settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('-start_time',),
@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='pageview',
             name='visitor',
-            field=models.ForeignKey(related_name='pageviews', to='tracking.Visitor'),
+            field=models.ForeignKey(related_name='pageviews', to='tracking.Visitor', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]
