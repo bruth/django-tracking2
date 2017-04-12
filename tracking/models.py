@@ -1,15 +1,15 @@
 import logging
 
+from django.conf import settings
+from django.db import models
 from django.utils import timezone
+
+from tracking.managers import VisitorManager, PageviewManager
+from tracking.settings import TRACK_USING_GEOIP
+
 from django.contrib.gis.geoip import HAS_GEOIP
 if HAS_GEOIP:
     from django.contrib.gis.geoip import GeoIP, GeoIPException
-from django.db import models
-from django.conf import settings
-from django.contrib.auth.signals import user_logged_out
-from django.db.models.signals import post_save
-from tracking.managers import VisitorManager, PageviewManager
-from tracking.settings import TRACK_USING_GEOIP
 
 GEOIP_CACHE_TYPE = getattr(settings, 'GEOIP_CACHE_TYPE', 4)
 
@@ -33,20 +33,20 @@ class Visitor(models.Model):
     objects = VisitorManager()
 
     def session_expired(self):
-        "The session has ended due to session expiration"
+        """The session has ended due to session expiration."""
         if self.expiry_time:
             return self.expiry_time <= timezone.now()
         return False
     session_expired.boolean = True
 
     def session_ended(self):
-        "The session has ended due to an explicit logout"
+        """The session has ended due to an explicit logout."""
         return bool(self.end_time)
     session_ended.boolean = True
 
     @property
     def geoip_data(self):
-        "Attempts to retrieve MaxMind GeoIP data based upon the visitor's IP"
+        """Attempt to retrieve MaxMind GeoIP data based on visitor's IP."""
         if not HAS_GEOIP or not TRACK_USING_GEOIP:
             return
 
@@ -81,8 +81,3 @@ class Pageview(models.Model):
 
     class Meta(object):
         ordering = ('-view_time',)
-
-
-from tracking import handlers
-user_logged_out.connect(handlers.track_ended_session)
-post_save.connect(handlers.post_save_cache, sender=Visitor)

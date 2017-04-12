@@ -242,4 +242,3 @@ class PageviewManager(models.Manager):
         stats['unique'] = unique_count
 
         return stats
-
