@@ -2,7 +2,7 @@ Overview
 ========
 
 [![Build Status](https://travis-ci.org/bruth/django-tracking2.svg?branch=master)](https://travis-ci.org/bruth/django-tracking2)
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/bruth/django-tracking2/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+[![PyPI](https://img.shields.io/pypi/v/django-tracking2.svg)](https://pypi.python.org/pypi/django-tracking2)
 
 django-tracking2 tracks the length of time visitors and registered users
 spend on your site. Although this will work for websites, this is more
@@ -56,14 +56,13 @@ MIDDLEWARE_CLASSES = (
 ```
 
 Django 1.7+
------------
-Django 1.7+ brings changes to the way database migrations are handled. If
+------------
+Django 1.7 brings changes to the way database migrations are handled. If
 you do not use database migrations you should not be worried. If you use
 south and have not upgraded to django 1.7, you'll have to upgrade to
-south==1.0.
+south==1.0 and django-tracking2==0.3.3.
 
-With south 1.0, south-based migrations are found in the `south_migrations`
-directory while django 1.7+ migrations are in the `migrations` directory.
+Releases of djagno-tracking2 after 0.3.3 will not support south.
 
 Settings
 --------

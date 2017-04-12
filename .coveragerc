@@ -8,7 +8,6 @@ omit =
   setup.py
   example/*
   tracking/migrations/*
-  tracking/south_migrations/*
   tracking/compat.py
   tracking/tests/*
 
