@@ -20,10 +20,8 @@ current state of the visitor.**
 Requirements
 ============
 * Django's [session framework][1] installed
-* [South][2] (if you want to use the packaged migrations)
 
-[1]: https://docs.djangoproject.com/en/1.3/topics/http/sessions/
-[2]: http://pypi.python.org/pypi/South
+[1]: https://docs.djangoproject.com/en/1.11/topics/http/sessions/
 
 Download
 ========
@@ -43,7 +41,7 @@ INSTALLED_APPS = (
 )
 ```
 
-If you use Django 1.7 `tracking` app should follow the app with your user model
+If you use Django 1.8+ `tracking` app should follow the app with your user model
 
 Add `tracking.middleware.VisitorTrackingMiddleware` to your project's
 `MIDDLEWARE_CLASSES` before the `SessionMiddleware`:
@@ -57,9 +55,9 @@ MIDDLEWARE_CLASSES = (
 )
 ```
 
-Django 1.7
-----------
-Django 1.7 brings changes to the way database migrations are handled. If
+Django 1.7+
+-----------
+Django 1.7+ brings changes to the way database migrations are handled. If
 you do not use database migrations you should not be worried. If you use
 south and have not upgraded to django 1.7, you'll have to upgrade to
 south==1.0.
