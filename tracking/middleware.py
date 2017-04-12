@@ -132,7 +132,7 @@ class VisitorTrackingMiddleware(MiddlewareMixin):
         # session since if authentication happens, the `session_key` carries
         # over, thus having a more accurate start time of session
         user = getattr(request, 'user', None)
-        if user and user.is_anonymous():
+        if user and user.is_anonymous:
             # set AnonymousUsers to None for simplicity
             user = None
 
