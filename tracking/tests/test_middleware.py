@@ -2,6 +2,7 @@ import re
 import sys
 
 import django
+from django.contrib.auth.models import User
 from django.test import TestCase
 try:
     from unittest.mock import patch
@@ -73,6 +74,22 @@ class MiddlewareTestCase(TestCase):
         self.assertEqual(Visitor.objects.count(), 1)
         visitor = Visitor.objects.get()
         self.assertEqual(visitor.user_agent, 'django')
+
+    def test_track_user_anon(self):
+        self.client.get('/')
+        self.assertEqual(Visitor.objects.count(), 1)
+        visitor = Visitor.objects.get()
+        self.assertEqual(visitor.user, None)
+
+    def test_track_user_me(self):
+        auth = {'username': 'me', 'password': 'me'}
+        user = User.objects.create_user(**auth)
+        self.assertTrue(self.client.login(**auth))
+
+        self.client.get('/')
+        self.assertEqual(Visitor.objects.count(), 1)
+        visitor = Visitor.objects.get()
+        self.assertEqual(visitor.user, user)
 
     @patch('tracking.middleware.TRACK_ANONYMOUS_USERS', False)
     def test_track_anonymous_users(self):
