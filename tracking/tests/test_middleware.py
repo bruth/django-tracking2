@@ -23,7 +23,7 @@ class MiddlewareTestCase(TestCase):
     def test_no_session(self, mock_warnings):
         # ignore if session middleware is not present
         tracking = 'tracking.middleware.VisitorTrackingMiddleware'
-        with self.settings(MIDDLEWARE_CLASSES=[tracking]):
+        with self.settings(MIDDLEWARE=[tracking]):
             self.client.get('/')
         self.assertEqual(Visitor.objects.count(), 0)
         self.assertEqual(Pageview.objects.count(), 0)
