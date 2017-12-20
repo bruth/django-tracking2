@@ -167,7 +167,10 @@ class VisitorManager(CacheManager):
         users = list(get_user_model().objects.filter(**user_kwargs).annotate(
             visit_count=Count('visit_history'),
             time_on_site=Avg('visit_history__time_on_site'),
-        ).filter(visit_count__gt=0).order_by('-time_on_site', 'username'))
+        ).filter(visit_count__gt=0).order_by(
+            '-time_on_site',
+            get_user_model().USERNAME_FIELD,
+        ))
 
         # Aggregate pageviews per visit
         for user in users:
