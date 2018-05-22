@@ -94,6 +94,8 @@ TRACK_IGNORE_STATUS_CODES = [400, 404, 403, 405, 410, 500]
 
 `TRACK_QUERY_STRING` - If True, query string for all pageviews will be tracked.  Default is False
 
+`TRACK_USING_GEOIP` - If True get city from IP with GeoIP.  Default is False
+
 Views
 -----
 To view aggregate data about all visitors and per-registered user stats,

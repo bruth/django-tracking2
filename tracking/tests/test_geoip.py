@@ -8,9 +8,15 @@ try:
 except ImportError:
     from mock import patch
 
-from django.contrib.gis.geoip import HAS_GEOIP
-if HAS_GEOIP:
-    from django.contrib.gis.geoip import GeoIPException
+# Use GeoIP2 or GeoIP following Dkango version
+dj_version = django.get_version()
+if dj_version[:3] >= '2.0':
+    from django.contrib.gis.geoip2 import GeoIP2Exception as GeoIPException
+else:
+    from django.contrib.gis.geoip import HAS_GEOIP
+    if HAS_GEOIP:
+        from django.contrib.gis.geoip import GeoIPException
+
 try:
     from unittest import skipUnless, skipIf
 except ImportError:
@@ -20,7 +26,6 @@ except ImportError:
 from tracking.models import Visitor
 
 # django 1.5 combined with python 3+ doesn't work, so skip it
-dj_version = django.get_version()
 broken_geoip = (dj_version[:3] == '1.5') and (sys.version_info[0] == 3)
 
 
