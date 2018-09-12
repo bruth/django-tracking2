@@ -72,6 +72,9 @@ is False
 `TRACK_ANONYMOUS_USERS` - If False, anonymous users will not be tracked.
 Default is True
 
+`TRACK_SUPERUSERS` - If False, users with the superuser flag set to True will
+not be tracked.  Default is True.
+
 `TRACK_PAGEVIEWS` - If True, individual pageviews will be tracked.
 
 `TRACK_IGNORE_URLS` - A list of regular expressions that will be matched
@@ -83,7 +86,7 @@ static serve view or via a lightweight server in production. Read more
 [here](https://docs.djangoproject.com/en/dev/howto/static-files/#serving-other-directories)
 
 `TRACK_IGNORE_STATUS_CODES` - A list of HttpResponse status codes that will be ignored.
-If the HttpResponse object has a `status_code` in this blacklist, the pageview record 
+If the HttpResponse object has a `status_code` in this blacklist, the pageview record
 will not be saved. For example,
 
 ```python

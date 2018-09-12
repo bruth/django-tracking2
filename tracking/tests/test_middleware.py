@@ -97,6 +97,26 @@ class MiddlewareTestCase(TestCase):
         self.assertEqual(Visitor.objects.count(), 0)
         self.assertEqual(Pageview.objects.count(), 0)
 
+    @patch('tracking.middleware.TRACK_SUPERUSERS', True)
+    def test_track_superusers_true(self):
+        auth = {'username': 'me', 'email': 'me@me.com', 'password': 'me'}
+        User.objects.create_superuser(**auth)
+        self.assertTrue(self.client.login(**auth))
+
+        self.client.get('/')
+        self.assertEqual(Visitor.objects.count(), 1)
+        self.assertEqual(Pageview.objects.count(), 1)
+
+    @patch('tracking.middleware.TRACK_SUPERUSERS', False)
+    def test_track_superusers_false(self):
+        auth = {'username': 'me', 'email': 'me@me.com', 'password': 'me'}
+        User.objects.create_superuser(**auth)
+        self.assertTrue(self.client.login(**auth))
+
+        self.client.get('/')
+        self.assertEqual(Visitor.objects.count(), 0)
+        self.assertEqual(Pageview.objects.count(), 0)
+
     def test_track_ignore_url(self):
         ignore_urls = [re.compile('foo')]
         with patch('tracking.middleware.track_ignore_urls', ignore_urls):
