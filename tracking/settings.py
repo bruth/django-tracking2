@@ -2,6 +2,7 @@ from django.conf import settings
 
 TRACK_AJAX_REQUESTS = getattr(settings, 'TRACK_AJAX_REQUESTS', False)
 TRACK_ANONYMOUS_USERS = getattr(settings, 'TRACK_ANONYMOUS_USERS', True)
+TRACK_SUPERUSERS = getattr(settings, 'TRACK_SUPERUSERS', True)
 
 TRACK_PAGEVIEWS = getattr(settings, 'TRACK_PAGEVIEWS', False)
 

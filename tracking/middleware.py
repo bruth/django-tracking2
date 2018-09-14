@@ -22,6 +22,7 @@ from tracking.settings import (
     TRACK_PAGEVIEWS,
     TRACK_QUERY_STRING,
     TRACK_REFERER,
+    TRACK_SUPERUSERS,
 )
 
 track_ignore_urls = [re.compile(x) for x in TRACK_IGNORE_URLS]
@@ -58,6 +59,10 @@ class VisitorTrackingMiddleware(MiddlewareMixin):
 
         # Do not tracking anonymous users if set
         if user is None and not TRACK_ANONYMOUS_USERS:
+            return False
+
+        # Do not track superusers if set
+        if user and user.is_superuser and not TRACK_SUPERUSERS:
             return False
 
         # Do not track ignored urls
