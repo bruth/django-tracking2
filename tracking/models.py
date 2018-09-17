@@ -7,9 +7,19 @@ from django.utils import timezone
 from tracking.managers import VisitorManager, PageviewManager
 from tracking.settings import TRACK_USING_GEOIP
 
-from django.contrib.gis.geoip import HAS_GEOIP
+try:
+    from django.contrib.gis.geoip import HAS_GEOIP
+except ImportError:
+    from django.contrib.gis.geoip2 import HAS_GEOIP2 as HAS_GEOIP
+
 if HAS_GEOIP:
-    from django.contrib.gis.geoip import GeoIP, GeoIPException
+    try:
+        from django.contrib.gis.geoip import GeoIP, GeoIPException
+    except ImportError:
+        from django.contrib.gis.geoip2 import (
+            GeoIP2 as GeoIP,
+            GeoIP2Exception as GeoIPException,
+        )
 
 GEOIP_CACHE_TYPE = getattr(settings, 'GEOIP_CACHE_TYPE', 4)
 
