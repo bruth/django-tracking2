@@ -28,7 +28,7 @@ except ImportError:
     # python2.6 doesn't have unittest.skip*
     from unittest2 import skipUnless, skipIf
 
-from tracking.models import Visitor
+from tracking.models import Visitor  # noqa
 
 # django 1.5 combined with python 3+ doesn't work, so skip it
 dj_version = django.get_version()
@@ -41,6 +41,7 @@ class GeoIPTestCase(TestCase):
         v = Visitor.objects.create(ip_address='8.8.8.8')  # sorry Google
         self.assertEqual(v.geoip_data, None)
 
+    @skipIf(dj_version[0] == '2', 'this test is for django 1.x')
     @skipIf(dj_version[:3] == '1.5', 'django 1.5 has GeoIP parsing issues')
     @skipUnless(getenv('CI'), 'cannot guarantee location of GeoIP data')
     @patch('tracking.models.TRACK_USING_GEOIP', True)
@@ -60,9 +61,31 @@ class GeoIPTestCase(TestCase):
             'country_code': 'US',
             'country_name': 'United States'
         }
+
         self.assertEqual(v.geoip_data, expected)
         # do it again, to verify the cached version hits
         self.assertEqual(v.geoip_data, expected)
+
+    @skipIf(dj_version[0] == '1', 'this test is for django 2.x')
+    @skipUnless(getenv('CI'), 'cannot guarantee location of GeoIP data')
+    @patch('tracking.models.TRACK_USING_GEOIP', True)
+    def test_geoip2(self):
+        v = Visitor.objects.create(ip_address='81.2.69.160')
+        geoip_expected = {
+            'city': 'London',
+            'country_code': 'GB',
+            'country_name': 'United Kingdom',
+            'dma_code': None,
+            'latitude': 51.5142,
+            'longitude': -0.0931,
+            'postal_code': None,
+            'region': 'ENG',
+            'time_zone': 'Europe/London'
+        }
+
+        self.assertEqual(v.geoip_data, geoip_expected)
+        # do it again, to verify the cached version hits
+        self.assertEqual(v.geoip_data, geoip_expected)
 
     @patch('tracking.models.TRACK_USING_GEOIP', True)
     def test_geoip_exc(self):
