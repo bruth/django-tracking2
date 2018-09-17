@@ -15,12 +15,9 @@ except ImportError:
 
 if HAS_GEOIP:
     try:
-        from django.contrib.gis.geoip import GeoIP, GeoIPException
+        from django.contrib.gis.geoip import GeoIPException
     except ImportError:
-        from django.contrib.gis.geoip2 import (
-            GeoIP2 as GeoIP,
-            GeoIP2Exception as GeoIPException,
-        )
+        from django.contrib.gis.geoip2 import GeoIP2Exception as GeoIPException
 
 try:
     from unittest import skipUnless, skipIf
@@ -71,7 +68,7 @@ class GeoIPTestCase(TestCase):
     @patch('tracking.models.TRACK_USING_GEOIP', True)
     def test_geoip2(self):
         v = Visitor.objects.create(ip_address='81.2.69.160')
-        geoip_expected = {
+        expected = {
             'city': 'London',
             'country_code': 'GB',
             'country_name': 'United Kingdom',
@@ -83,9 +80,9 @@ class GeoIPTestCase(TestCase):
             'time_zone': 'Europe/London'
         }
 
-        self.assertEqual(v.geoip_data, geoip_expected)
+        self.assertEqual(v.geoip_data, expected)
         # do it again, to verify the cached version hits
-        self.assertEqual(v.geoip_data, geoip_expected)
+        self.assertEqual(v.geoip_data, expected)
 
     @patch('tracking.models.TRACK_USING_GEOIP', True)
     def test_geoip_exc(self):
