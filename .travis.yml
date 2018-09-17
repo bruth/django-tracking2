@@ -46,6 +46,7 @@ addons:
 install:
     - pip install "$DJANGO"
     - pip install geoip
+    - pip install geoip2
     - pip install coverage django-discover-runner mock unittest2
     - pip freeze
     - python setup.py develop
