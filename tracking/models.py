@@ -79,7 +79,7 @@ class Visitor(models.Model):
     class Meta(object):
         ordering = ('-start_time',)
         permissions = (
-            ('view_visitor', 'Can view visitor'),
+            ('visitor_log', 'Can view visitor'),
         )
 
 

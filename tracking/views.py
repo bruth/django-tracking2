@@ -27,7 +27,7 @@ class DashboardForm(forms.Form):
     end = forms.DateTimeField(required=False, input_formats=input_formats)
 
 
-@permission_required('tracking.view_visitor')
+@permission_required('tracking.visitor_log')
 def dashboard(request):
     "Counts, aggregations and more!"
     end_time = now()
