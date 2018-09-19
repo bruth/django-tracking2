@@ -109,8 +109,6 @@ class GeoIPTestCase(TestCase):
 
     @patch('tracking.models.TRACK_USING_GEOIP', True)
     def test_geoip_exc(self):
-        print()
-        print('xxxx', dj_version)
         with patch('tracking.models.GeoIP', autospec=True) as mock_geo:
             mock_geo.side_effect = GeoIPException('bad data')
             v = Visitor.objects.create(ip_address='64.17.254.216')
