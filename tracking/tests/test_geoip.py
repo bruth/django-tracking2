@@ -42,7 +42,7 @@ class GeoIPTestCase(TestCase):
     @skipIf(dj_version[:3] == '1.5', 'django 1.5 has GeoIP parsing issues')
     @skipUnless(getenv('CI'), 'cannot guarantee location of GeoIP data')
     @patch('tracking.models.TRACK_USING_GEOIP', True)
-    def test_geoip(self):
+    def test_geoip_django_1x(self):
         v = Visitor.objects.create(ip_address='64.17.254.216')
         expected = {
             'city': 'El Segundo',
@@ -63,14 +63,37 @@ class GeoIPTestCase(TestCase):
         # do it again, to verify the cached version hits
         self.assertEqual(v.geoip_data, expected)
 
-    @skipIf(dj_version[0] == '1', 'this test is for django 2.x')
+    @skipUnless(dj_version[0] == '2' and dj_version[2] == '0', 'this test is for django 2.0')  # noqa
     @skipUnless(getenv('CI'), 'cannot guarantee location of GeoIP data')
     @patch('tracking.models.TRACK_USING_GEOIP', True)
-    def test_geoip2(self):
+    def test_geoip2_django_20(self):
         v = Visitor.objects.create(ip_address='81.2.69.160')
         expected = {
             'city': 'London',
             'country_code': 'GB',
+            'country_name': 'United Kingdom',
+            'dma_code': None,
+            'latitude': 51.5142,
+            'longitude': -0.0931,
+            'postal_code': None,
+            'region': 'ENG',
+            'time_zone': 'Europe/London'
+        }
+
+        self.assertEqual(v.geoip_data, expected)
+        # do it again, to verify the cached version hits
+        self.assertEqual(v.geoip_data, expected)
+
+    @skipUnless(dj_version[0] == '2' and dj_version[2] == '1', 'this test is for django 2.1')  # noqa
+    @skipUnless(getenv('CI'), 'cannot guarantee location of GeoIP data')
+    @patch('tracking.models.TRACK_USING_GEOIP', True)
+    def test_geoip2_django_21(self):
+        v = Visitor.objects.create(ip_address='81.2.69.160')
+        expected = {
+            'city': 'London',
+            'country_code': 'GB',
+            'continent_code': 'EU',
+            'continent_name': 'Europe',
             'country_name': 'United Kingdom',
             'dma_code': None,
             'latitude': 51.5142,

@@ -55,15 +55,9 @@ MIDDLEWARE_CLASSES = (
 )
 ```
 
-Django 1.7 - 2.0
+Django 1.11 - 2.1
 ------------
-Django 1.7 brings changes to the way database migrations are handled. If
-you do not use database migrations you should not be worried. If you use
-south and have not upgraded to django 1.7, you'll have to upgrade to
-south==1.0 and django-tracking2==0.3.3.  Currently, Django 2.1 isn't supported,
-but Django 2.0 is.
-
-Releases of djagno-tracking2 after 0.3.3 will not support south.
+If you are upgrading from previous versions to Django 2.1, you must apply migrations again.
 
 Settings
 --------
@@ -113,7 +107,7 @@ urlpatterns = patterns('',
 )
 ```
 
-These urls are protected by a custom Django permission `tracking.view_visitor`.
+These urls are protected by a custom Django permission `tracking.visitor_log`.
 Thus only superusers and users granted this permission can view these pages.
 
 Available URLs
