@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{% firstof user.get_full_name user %} Visit Overview - django-tracking2</title>
+</head>
+<body>
+    <h1>{% firstof user.get_full_name user %} Visit Overview - django-tracking2</h1>
+    <div id="tracking-filters">
+        <form method="GET">
+            {{ form.as_table }}
+            <input type="submit" name="submit" value="submit" />
+        </form>
+    </div>
+    <div id="tracking-info">
+        <p>
+            Visitor tracking began on
+            {{ track_start_time|date:"Y-m-d H:i:s" }}
+        </p>
+        {% if warn_incomplete %}
+        <p class=warning>
+            The start time precedes the oldest tracked visitor, thus
+            the stats are not complete for the specified range.
+        </p>
+        {% endif %}
+    </div>
+    <div id="tracking-stats">
+        <dl>
+            <dt># Visits</dt>
+            <dt>{{ user.visit_count }}</dt>
+            <dt>Avg. Time on Site</dt>
+            <dt>{{ user.time_on_site|default_if_none:"n/a" }}</dt>
+            <dt>Avg. Pages/Visit</dt>
+            <dt>{{ user.pages_per_visit|floatformat|default:"n/a" }}</dt>
+      </dl>
+      
+        <table>
+            <caption>Visits by {% firstof user.get_full_name user %}</caption>
+            <thead>
+                <th>Start Time</th>
+                <th>End Time</th>
+            </thead>
+            <tbody>
+                {% for visit in visits %}
+                <tr>
+                    <td>{{ visit.start_time|date:"Y-m-d H:i:s" }}</td>
+                    <td>{{ visit.end_time|date:"Y-m-d H:i:s" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>	    
+        </table>
+    </div>
+</body>
+</html>

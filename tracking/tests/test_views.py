@@ -18,9 +18,9 @@ class ViewsTestCase(TestCase):
 
     def setUp(self):
         self.auth = {'username': 'john', 'password': 'smith'}
-        user = User.objects.create_user(**self.auth)
-        user.is_superuser = True
-        user.save()
+        self.user = User.objects.create_user(**self.auth)
+        self.user.is_superuser = True
+        self.user.save()
         self.assertTrue(self.client.login(**self.auth))
 
     def test_dashboard_default(self):
@@ -70,6 +70,45 @@ class ViewsTestCase(TestCase):
         visitor = Visitor.objects.get()
         self.assertEqual(visitor.end_time, self.now)
         self.assertTrue(visitor.time_on_site > 0)
+
+    def test_visitor_overview_default(self):
+        # make a non PAGEVIEW tracking request
+        Visitor.objects.create(
+            session_key='skey',
+            ip_address='127.0.0.1',
+            user=self.user,
+            time_on_site = 0,
+        )
+        response = self.client.get('/tracking/visitors/%s/' % self.user.pk)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['user'],
+            self.user)
+
+    def test_visitor_overview_times(self):
+        # make a non PAGEVIEW tracking request
+        Visitor.objects.create(
+            session_key='skey',
+            ip_address='127.0.0.1',
+            user=self.user,
+            time_on_site = 0,
+        )
+        response = self.client.get(
+            '/tracking/visitors/%s/?start=2014-11&end=2014-12-01' % self.user.pk)
+        self.assertEqual(response.status_code, 200)
+
+    def test_visitor_overview_times_bad(self):
+        # make a non PAGEVIEW tracking request
+        Visitor.objects.create(
+            session_key='skey',
+            ip_address='127.0.0.1',
+            user=self.user,
+            time_on_site = 0,
+        )
+        response = self.client.get(
+            '/tracking/visitors/%s/?start=2014-aa&end=2014-12-01' % self.user.pk)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Enter a valid date/time.')
 
 
 class AdminViewTestCase(TestCase):
