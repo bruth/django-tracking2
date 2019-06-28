@@ -73,8 +73,42 @@ def dashboard(request):
 
 @permission_required('tracking.visitor_log')
 def visitor_overview(request, user_id):
-    print('user_id')
-    print(user_id)
+    "Counts, aggregations and more!"
+#     user = get_object_or_404(get_user_model(), pk=user_id)
+    end_time = now()
+    start_time = end_time - timedelta(days=7)
+    defaults = {'start': start_time, 'end': end_time}
+
+    form = DashboardForm(data=request.GET or defaults)
+    if form.is_valid():
+        start_time = form.cleaned_data['start']
+        end_time = form.cleaned_data['end']
+ 
+    # determine when tracking began
+    try:
+        obj = Visitor.objects.order_by('start_time')[0]
+        track_start_time = obj.start_time
+    except (IndexError, Visitor.DoesNotExist):
+        track_start_time = now()
+ 
+    # If the start_date is before tracking began, warn about incomplete data
+    warn_incomplete = (start_time < track_start_time)
+
+    # queries take `date` objects (for now)
+    user = Visitor.objects.user_stats(start_time, end_time).filter(pk=user_id).first()
+    visits = Visitor.objects.filter(start_time__range=(start_time, end_time))
+
+    context = {
+        'form': form,
+        'track_start_time': track_start_time,
+        'warn_incomplete': warn_incomplete,
+        'visits': visits,
+        'user': user,
+    }
+    return render(request, 'tracking/visitor_overview.html', context)
+
+@permission_required('tracking.visitor_log')
+def visitor_visits(request, visit_id):
     "Counts, aggregations and more!"
 #     user = get_object_or_404(get_user_model(), pk=user_id)
     end_time = now()
