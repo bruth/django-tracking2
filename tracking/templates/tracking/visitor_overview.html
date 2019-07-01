@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>{% firstof user.get_full_name user %} Visit Overview - django-tracking2</title>
+<title>{% firstof user.get_full_name user %} Visits Overview - django-tracking2</title>
 </head>
 <body>
-    <h1>{% firstof user.get_full_name user %} Visit Overview - django-tracking2</h1>
+    <h1>{% firstof user.get_full_name user %} Visits Overview - django-tracking2</h1>
     <div id="tracking-filters">
         <form method="GET">
             {{ form.as_table }}
@@ -26,11 +26,11 @@
     <div id="tracking-stats">
         <dl>
             <dt># Visits</dt>
-            <dt>{{ user.visit_count }}</dt>
+            <dd>{{ user.visit_count }}</dt>
             <dt>Avg. Time on Site</dt>
-            <dt>{{ user.time_on_site|default_if_none:"n/a" }}</dt>
+            <dd>{{ user.time_on_site|default_if_none:"n/a" }}</dt>
             <dt>Avg. Pages/Visit</dt>
-            <dt>{{ user.pages_per_visit|floatformat|default:"n/a" }}</dt>
+            <dd>{{ user.pages_per_visit|floatformat|default:"n/a" }}</dt>
       </dl>
       
         <table>
@@ -42,8 +42,8 @@
             <tbody>
                 {% for visit in visits %}
                 <tr>
-                    <td>{{ visit.start_time|date:"Y-m-d H:i:s" }}</td>
-                    <td>{{ visit.end_time|date:"Y-m-d H:i:s" }}</td>
+                    <td><a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}>{{ visit.start_time|date:"Y-m-d H:i:s" }}</a></td>
+                    <td><a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}>{{ visit.end_time|date:"Y-m-d H:i:s" }}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>	    
