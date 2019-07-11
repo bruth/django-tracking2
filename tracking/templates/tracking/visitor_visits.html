@@ -10,7 +10,7 @@
             <dt>Duration</dt>
             <dd>{{ visit.time_on_site }}</dt>
             <dt># of Page Views</dt>
-            <dd>{{ len(pageviews) }}</dt>
+            <dd>{{ pageviews|length }}</dt>
             <dt>IP</dt>
             <dd>{{ visit.ip_address }}</dt>
             <dt>User Agent</dt>
@@ -23,11 +23,10 @@
             <th># of views</th>
         </thead>
         <tbody>
-        {% regroup pageviews by url as pageList %}
-        {% for page in pageList %}
+        {% for url, views in pageview_stats.items %}
             <tr>
-                <td>{{ pageList.grouper }}</td>
-                <td>{{ len(pageList) }}</td>
+                <td>{{ url }}</td>
+                <td>{{ views }}</td>
             </tr>
         {% endfor %}
         </tbody>

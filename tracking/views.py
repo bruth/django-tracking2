@@ -1,6 +1,7 @@
 import logging
 
 from datetime import timedelta
+from statistics import mean
 
 from django import forms
 from django.shortcuts import (
@@ -13,6 +14,7 @@ from django.utils.timezone import now
 
 from tracking.models import Visitor, Pageview
 from tracking.settings import TRACK_PAGEVIEWS
+from _collections import OrderedDict
 
 log = logging.getLogger(__file__)
 
@@ -96,7 +98,7 @@ def visitor_overview(request, user_id):
 
     # queries take `date` objects (for now)
     user = Visitor.objects.user_stats(start_time, end_time).filter(pk=user_id).first()
-    visits = Visitor.objects.filter(start_time__range=(start_time, end_time))
+    visits = Visitor.objects.filter(user=user, start_time__range=(start_time, end_time))
 
     context = {
         'form': form,
@@ -111,9 +113,41 @@ def visitor_overview(request, user_id):
 def visitor_visits(request, visit_id):
     visit = get_object_or_404(Visitor, pk=visit_id)
     pageviews = visit.pageviews.all()
+    pageview_stats = {}
+    for v in pageviews:
+        if v.url not in pageview_stats:
+            pageview_stats[v.url] = 0
+        pageview_stats[v.url] += 1
+    pageview_stats = OrderedDict(sorted(pageview_stats.items(), key=lambda x: x[1], reverse=True))
 
     context = {
         'visit': visit,
         'pageviews': pageviews,
+        'pageview_stats': pageview_stats,
+    }
+    return render(request, 'tracking/visitor_visits.html', context)
+
+@permission_required('tracking.visitor_log')
+def visitor_page_detail(request, user_id, page_url):
+    user = get_object_or_404(get_user_model(), pk=user_id)
+    pageviews = Pageview.objects.filter(url=page_url, visitor__user__pk=user_id)
+    totalViewTime = 0
+    numPageViews = 0
+    viewsPerVisit = {}
+    for v in pageviews:
+        numPageViews += 1
+        totalViewTime += v.view_time
+        if v.pk not in viewsPerVisit:
+            viewsPerVisit[v.pk] = 0
+        viewsPerVisit[v.pk] += 1
+    visits = Visitor.objects.filter(pageviews__in=pageviews).order_by('end_time', 'start_time')
+
+    context = {
+        'total_views': numPageViews,
+        'avg_duration': totalViewTime/numPageViews,
+        'avg_views_per_visit': mean(viewsPerVisit.values()),
+        'visits': visits,
+        'user': user,
+        'page_url': page_url,
     }
     return render(request, 'tracking/visitor_visits.html', context)

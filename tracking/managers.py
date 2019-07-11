@@ -1,5 +1,7 @@
 from __future__ import division
 
+import logging
+
 from datetime import timedelta
 from django.utils import timezone
 from django.contrib.auth import get_user_model
@@ -8,6 +10,7 @@ from django.db.models import Count, Avg, Sum
 from tracking.settings import TRACK_PAGEVIEWS, TRACK_ANONYMOUS_USERS
 from tracking.cache import CacheManager
 
+log = logging.getLogger(__file__)
 
 class VisitorManager(CacheManager):
     def active(self, registered_only=True):
@@ -163,12 +166,14 @@ class VisitorManager(CacheManager):
         else:
             user_kwargs['visit_history__start_time__isnull'] = False
             visit_kwargs['start_time__isnull'] = False
+            
+        log.critical(visit_kwargs)
 
         users = get_user_model().objects.filter(**user_kwargs).annotate(
-            visit_count=Count('visit_history'),
+            visit_count=Count('visit_history', distinct=True),
             time_on_site=Avg('visit_history__time_on_site'),
-            page_count=Count('visit_history__pageviews'),
-            pages_per_visit = Count('visit_history__pageviews') / Count('visit_history'),
+            page_count=Count('visit_history__pageviews', distinct=True),
+            pages_per_visit=Count('visit_history__pageviews', distinct=True)/Count('visit_history', distinct=True),
         ).filter(visit_count__gt=0).order_by(
             '-time_on_site',
             get_user_model().USERNAME_FIELD,
