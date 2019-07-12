@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{% firstof pageview.visitor.user.get_full_name pageview.visitor.user.user %} {{ pageview.view_time|date:"Y-m-d H:i:s" }} {{ pageview.url }} Pageview - django-tracking2</title>
+</head>
+<body>
+    <h1>{% firstof pageview.visitor.user.get_full_name pageview.visitor.user.user %} {{ pageview.view_time|date:"Y-m-d H:i:s" }} {{ pageview.url }} Pageview - django-tracking2</h1>
+    <div id="tracking-stats">
+        <dl>
+            <dt>Method</dt>
+            <dd>{{ pageview.method }}</dt>
+        </dl>
+    </div>
+</body>
+</html>

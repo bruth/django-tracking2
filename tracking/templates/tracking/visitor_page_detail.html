@@ -9,13 +9,11 @@
         <dl>
             <dt>Total Views</dt>
             <dd>{{ total_views }}</dt>
-            <dt>Avg Duration</dt>
-            <dd>{{ avg_duration }}</dt>
             <dt>Avg Views/Visit</dt>
             <dd>{{ avg_views_per_visit }}</dt>
         </dl>
         <table>
-            <caption>Visits involving {% page_url %} by {% firstof user.get_full_name user %}</caption>
+            <caption>Visits involving {{ page_url }} by {% firstof user.get_full_name user %}</caption>
             <thead>
                 <th>Start Time</th>
                 <th>End Time</th>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Page Overview - django-tracking2</title>
+</head>
+<body>
+    <h1>Page Overview - django-tracking2</h1>
+    <div id="tracking-stats">
+        <dl>
+            <dt>Total Page Views</dt>
+            <dd>{{ total_page_views }}</dt>
+            <dt># of Pages Viewed</dt>
+            <dd>{{ total_pages }}</dt>
+        </dl>
+        <table>
+            <caption>Pages</caption>
+            <thead>
+                <th>URL</th>
+                <th># of Views</th>
+            </thead>
+            <tbody>
+                {% for c in pageview_counts %}
+                <tr>
+                    <td>{{ c.url }}</td>
+                    <td>{{ c.views }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>	    
+        </table>
+    </div>
+</body>
+</html>

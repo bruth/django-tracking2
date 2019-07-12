@@ -2,6 +2,8 @@ import logging
 
 from datetime import timedelta
 from statistics import mean
+from functools import reduce
+from operator import add
 
 from django import forms
 from django.shortcuts import (
@@ -11,6 +13,7 @@ from django.shortcuts import (
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import permission_required
 from django.utils.timezone import now
+from django.db.models import Count, Avg, Sum
 
 from tracking.models import Visitor, Pageview
 from tracking.settings import TRACK_PAGEVIEWS
@@ -131,23 +134,40 @@ def visitor_visits(request, visit_id):
 def visitor_page_detail(request, user_id, page_url):
     user = get_object_or_404(get_user_model(), pk=user_id)
     pageviews = Pageview.objects.filter(url=page_url, visitor__user__pk=user_id)
-    totalViewTime = 0
     numPageViews = 0
     viewsPerVisit = {}
     for v in pageviews:
         numPageViews += 1
-        totalViewTime += v.view_time
         if v.pk not in viewsPerVisit:
             viewsPerVisit[v.pk] = 0
         viewsPerVisit[v.pk] += 1
-    visits = Visitor.objects.filter(pageviews__in=pageviews).order_by('end_time', 'start_time')
+    visits = Visitor.objects.filter(pageviews__in=pageviews).distinct().order_by('end_time', 'start_time')
 
     context = {
         'total_views': numPageViews,
-        'avg_duration': totalViewTime/numPageViews,
         'avg_views_per_visit': mean(viewsPerVisit.values()),
         'visits': visits,
         'user': user,
         'page_url': page_url,
     }
-    return render(request, 'tracking/visitor_visits.html', context)
+    return render(request, 'tracking/visitor_page_detail.html', context)
+
+@permission_required('tracking.visitor_log')
+def visitor_pageview_detail(request, user_id, pageview_id):
+    pageview = get_object_or_404(Pageview, pk=pageview_id)
+
+    context = {
+        'pageview': pageview,
+    }
+    return render(request, 'tracking/visitor_pageview_detail.html', context)
+
+@permission_required('tracking.visitor_log')
+def page_overview(request):
+    pageview_counts = Pageview.objects.values('url').annotate(views=Count('url')).order_by('-views')
+
+    context = {
+        'pageview_counts': pageview_counts,
+        'total_page_views': reduce(lambda acc, c: acc + c['views'], pageview_counts, 0),
+        'total_pages': len(pageview_counts),
+    }
+    return render(request, 'tracking/page_overview.html', context)
