@@ -154,7 +154,7 @@ def visitor_page_detail(request, user_id, page_url):
 
 @permission_required('tracking.visitor_log')
 def visitor_pageview_detail(request, user_id, pageview_id):
-    pageview = get_object_or_404(Pageview, pk=pageview_id)
+    pageview = get_object_or_404(Pageview, pk=pageview_id, visitor__user_id=user_id)
 
     context = {
         'pageview': pageview,
@@ -171,3 +171,16 @@ def page_overview(request):
         'total_pages': len(pageview_counts),
     }
     return render(request, 'tracking/page_overview.html', context)
+
+@permission_required('tracking.visitor_log')
+def page_detail(request, page_url):
+    pageviews = Pageview.objects.filter(url=page_url)
+    uniqueVisitors = Pageview.objects.values('visitor_id').distinct().count()
+    visits = Visitor.objects.filter(pageviews__in=pageviews).distinct().order_by('end_time', 'start_time')
+
+    context = {
+        'total_views': pageviews.count(),
+        'visitors': uniqueVisitors,
+        'pageviews': pageviews.order_by('-view_time'),
+    }
+    return render(request, 'tracking/page_detail.html', context)
