@@ -1,5 +1,6 @@
 import logging
 
+from _collections import OrderedDict
 from datetime import timedelta
 from statistics import mean
 from functools import reduce
@@ -10,14 +11,15 @@ from django.shortcuts import (
     render,
     get_object_or_404,
 )
+from django.http import HttpResponseNotFound
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import permission_required
 from django.utils.timezone import now
 from django.db.models import Count, Avg, Sum
+from django.core.paginator import Paginator
 
 from tracking.models import Visitor, Pageview
 from tracking.settings import TRACK_PAGEVIEWS
-from _collections import OrderedDict
 
 log = logging.getLogger(__file__)
 
@@ -29,7 +31,6 @@ input_formats = [
     '%Y-%m',                # '2006-10'
     '%Y',                   # '2006'
 ]
-
 
 class DashboardForm(forms.Form):
     start = forms.DateTimeField(required=False, input_formats=input_formats)
@@ -80,6 +81,7 @@ def dashboard(request):
 def visitor_overview(request, user_id):
     "Counts, aggregations and more!"
 #     user = get_object_or_404(get_user_model(), pk=user_id)
+    page = request.GET.get('page', 1)
     end_time = now()
     start_time = end_time - timedelta(days=7)
     defaults = {'start': start_time, 'end': end_time}
@@ -102,36 +104,45 @@ def visitor_overview(request, user_id):
     # queries take `date` objects (for now)
     user = Visitor.objects.user_stats(start_time, end_time).filter(pk=user_id).first()
     visits = Visitor.objects.filter(user=user, start_time__range=(start_time, end_time))
+    paginator = Paginator(visits, 100)
 
     context = {
         'form': form,
         'track_start_time': track_start_time,
         'warn_incomplete': warn_incomplete,
-        'visits': visits,
+        'visits': paginator.page(page),
         'user': user,
     }
     return render(request, 'tracking/visitor_overview.html', context)
 
 @permission_required('tracking.visitor_log')
 def visitor_visits(request, visit_id):
+    page = request.GET.get('page', 1)
     visit = get_object_or_404(Visitor, pk=visit_id)
     pageviews = visit.pageviews.all()
     pageview_stats = {}
     for v in pageviews:
         if v.url not in pageview_stats:
-            pageview_stats[v.url] = 0
-        pageview_stats[v.url] += 1
-    pageview_stats = OrderedDict(sorted(pageview_stats.items(), key=lambda x: x[1], reverse=True))
+            pageview_stats[v.url] = {
+                'views': 0,
+            }
+        pageview_stats[v.url]['views'] += 1
+    pageview_stats = OrderedDict(sorted(pageview_stats.items(), key=lambda x: x[1]['views'], reverse=True))
+    paginator = Paginator(pageviews, 100)
 
     context = {
         'visit': visit,
-        'pageviews': pageviews,
+        'pageviews': paginator.page(page),
         'pageview_stats': pageview_stats,
     }
     return render(request, 'tracking/visitor_visits.html', context)
 
 @permission_required('tracking.visitor_log')
-def visitor_page_detail(request, user_id, page_url):
+def visitor_page_detail(request, user_id):
+    try:
+        page_url = request.GET['page_url']
+    except:
+        return HttpResponseNotFound()   
     user = get_object_or_404(get_user_model(), pk=user_id)
     pageviews = Pageview.objects.filter(url=page_url, visitor__user__pk=user_id)
     numPageViews = 0
@@ -174,13 +185,18 @@ def page_overview(request):
 
 @permission_required('tracking.visitor_log')
 def page_detail(request, page_url):
-    pageviews = Pageview.objects.filter(url=page_url)
+    try:
+        page_url = request.GET['page_url']
+    except:
+        return HttpResponseNotFound()   
+    pageviews = Pageview.objects.filter(url=page_url).order_by('-view_time')
+    pv_count = pageviews.count()
     uniqueVisitors = Pageview.objects.values('visitor_id').distinct().count()
-    visits = Visitor.objects.filter(pageviews__in=pageviews).distinct().order_by('end_time', 'start_time')
 
     context = {
-        'total_views': pageviews.count(),
+        'total_views': pv_count,
         'visitors': uniqueVisitors,
         'pageviews': pageviews.order_by('-view_time'),
+        'page_url': page_url,
     }
     return render(request, 'tracking/page_detail.html', context)

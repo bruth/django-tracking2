@@ -15,14 +15,16 @@
         <table>
             <caption>Pageviews</caption>
             <thead>
-                <th>Start Time</th>
-                <th>End Time</th>
+                <th>Time</th>
+                <th>User</th>
+                <th>URL</th>
             </thead>
             <tbody>
-                {% for visit in visits %}
+                {% for pv in pageviews %}
                 <tr>
-                    <td><a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}>{{ visit.start_time|date:"Y-m-d H:i:s" }}</a></td>
-                    <td><a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}>{{ visit.end_time|date:"Y-m-d H:i:s" }}</a></td>
+                    <td><a href={% url 'tracking-visitor-page-detail' user_id=pv.visitor.user.pk %}?page_url={{ page_url }}>{{ pv.view_time|date:"Y-m-d H:i:s" }}</a></td>
+                    <td><a href={% url 'tracking-visitor-page-detail' user_id=pv.visitor.user.pk %}?page_url={{ page_url }}>{% firstof user.get_full_name user %}</a></td>
+                    <td><a href={% url 'tracking-visitor-page-detail' user_id=pv.visitor.user.pk %}?page_url={{ page_url }}>{{ page_url }}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>	    

@@ -33,6 +33,12 @@
             <dd>{{ user.pages_per_visit|floatformat|default:"n/a" }}</dt>
       </dl>
       
+        {% if visits.has_previous %}
+            <a href={% url 'tracking-visitor-overview' user_id=user.pk %}?page={{ visits.previous_page_number }}>previous</a>
+        {% endif %}
+        {% if visits.has_next %}
+            <a href={% url 'tracking-visitor-overview' user_id=user.pk %}?page={{ visits.next_page_number }}>next</a>
+        {% endif %}
         <table>
             <caption>Visits by {% firstof user.get_full_name user %}</caption>
             <thead>
@@ -48,6 +54,12 @@
                 {% endfor %}
             </tbody>	    
         </table>
+        {% if visits.has_previous %}
+            <a href={% url 'tracking-visitor-overview' user_id=user.pk %}?page={{ visits.previous_page_number }}>previous</a>
+        {% endif %}
+        {% if visits.has_next %}
+            <a href={% url 'tracking-visitor-overview' user_id=user.pk %}?page={{ visits.next_page_number }}>next</a>
+        {% endif %}
     </div>
 </body>
 </html>
