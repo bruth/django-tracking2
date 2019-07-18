@@ -117,23 +117,20 @@ def visitor_overview(request, user_id):
 
 @permission_required('tracking.visitor_log')
 def visitor_visits(request, visit_id):
-    page = request.GET.get('page', 1)
+    pvpage = request.GET.get('pvpage', 1)
+    pvspage = request.GET.get('pvspage', 1)
     visit = get_object_or_404(Visitor, pk=visit_id)
-    pageviews = visit.pageviews.all()
-    pageview_stats = {}
-    for v in pageviews:
-        if v.url not in pageview_stats:
-            pageview_stats[v.url] = {
-                'views': 0,
-            }
-        pageview_stats[v.url]['views'] += 1
-    pageview_stats = OrderedDict(sorted(pageview_stats.items(), key=lambda x: x[1]['views'], reverse=True))
-    paginator = Paginator(pageviews, 100)
+    pvcount = visit.pageviews.count()
+    pageviews = visit.pageviews.order_by('-view_time')
+    pageview_stats = visit.pageviews.values('url').annotate(views=Count('url')).order_by('-views')
+    pvspaginator = Paginator(pageview_stats, 100)
+    pvpaginator = Paginator(pageviews, 100)
 
     context = {
         'visit': visit,
-        'pageviews': paginator.page(page),
-        'pageview_stats': pageview_stats,
+        'pageviews': pvpaginator.page(pvpage),
+        'pageview_stats': pvspaginator.page(pvspage),
+        'pvcount': pvcount,
     }
     return render(request, 'tracking/visitor_visits.html', context)
 
@@ -144,19 +141,24 @@ def visitor_page_detail(request, user_id):
     except:
         return HttpResponseNotFound()   
     user = get_object_or_404(get_user_model(), pk=user_id)
-    pageviews = Pageview.objects.filter(url=page_url, visitor__user__pk=user_id)
-    numPageViews = 0
-    viewsPerVisit = {}
-    for v in pageviews:
-        numPageViews += 1
-        if v.pk not in viewsPerVisit:
-            viewsPerVisit[v.pk] = 0
-        viewsPerVisit[v.pk] += 1
-    visits = Visitor.objects.filter(pageviews__in=pageviews).distinct().order_by('end_time', 'start_time')
+    aggs = Visitor.objects.filter(
+        pageviews__url=page_url,
+        user__pk=user_id,
+    ).values('pk').annotate(views=Count('pageciews')).aggregate(
+        Avg('pageviews__count'),
+        Sum('pageviews__count')
+    )
+    visits = Visitor.objects.filter(
+        pageviews__url=page_url,
+        user__pk=user_id,
+    ).distinct().order_by(
+        'end_time',
+        'start_time'
+    )
 
     context = {
-        'total_views': numPageViews,
-        'avg_views_per_visit': mean(viewsPerVisit.values()),
+        'total_views': aggs['pageviews__count__sum'],
+        'avg_views_per_visit': aggs['pageviews__count__avg'],
         'visits': visits,
         'user': user,
         'page_url': page_url,
