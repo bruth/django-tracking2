@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>{% firstof visit.user.get_full_name visit.user %} {{ visit.start_time|date:"Y-m-d H:i:s" }} - {{ visit.end_time|date:"Y-m-d H:i:s" }} Visit Overview - django-tracking2</title>
+<title>{% firstof visit.user.get_full_name visit.user %} {{ visit.start_time|date:"Y-m-d H:i:s" }} - {{ visit.end_time|date:"Y-m-d H:i:s" }} Visit Detail - django-tracking2</title>
 </head>
 <body>
-    <h1>{% firstof visit.user.get_full_name visit.user %} {{ visit.start_time|date:"Y-m-d H:i:s" }} - {{ visit.end_time|date:"Y-m-d H:i:s" }} Visit Overview - django-tracking2</h1>
+    <h1>{% firstof visit.user.get_full_name visit.user %} {{ visit.start_time|date:"Y-m-d H:i:s" }} - {{ visit.end_time|date:"Y-m-d H:i:s" }} Visit Detail - django-tracking2</h1>
     <div id="tracking-stats">
         <dl>
             <dt>Duration</dt>
             <dd>{{ visit.time_on_site }}</dt>
             <dt># of Page Views</dt>
             <dd>{{ pvcount }}</dt>
+            <dt>Avg Time/Page</dt>
+            <dd>{{ avg_time_per_page|default_if_none:"n/a" }}</dt>
             <dt>IP</dt>
             <dd>{{ visit.ip_address }}</dt>
             <dt>User Agent</dt>

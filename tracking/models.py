@@ -38,7 +38,7 @@ class Visitor(models.Model):
     # Update to GenericIPAddress in Django 1.4
     ip_address = models.CharField(max_length=39, editable=False)
     user_agent = models.TextField(null=True, editable=False)
-    start_time = models.DateTimeField(default=timezone.now, editable=False)
+    start_time = models.DateTimeField(default=timezone.now, editable=False, db_index=True)
     expiry_age = models.IntegerField(null=True, editable=False)
     expiry_time = models.DateTimeField(null=True, editable=False)
     time_on_site = models.IntegerField(null=True, editable=False)
@@ -89,11 +89,11 @@ class Pageview(models.Model):
         related_name='pageviews',
         on_delete=models.CASCADE,
     )
-    url = models.TextField(null=False, editable=False)
+    url = models.TextField(null=False, editable=False, db_index=True)
     referer = models.TextField(null=True, editable=False)
     query_string = models.TextField(null=True, editable=False)
     method = models.CharField(max_length=20, null=True)
-    view_time = models.DateTimeField()
+    view_time = models.DateTimeField(db_index=True)
 
     objects = PageviewManager()
 

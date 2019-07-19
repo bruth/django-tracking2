@@ -103,6 +103,8 @@ def visitor_overview(request, user_id):
 
     # queries take `date` objects (for now)
     user = Visitor.objects.user_stats(start_time, end_time).filter(pk=user_id).first()
+    if user:
+        user.time_on_site = timedelta(seconds=user.time_on_site)
     visits = Visitor.objects.filter(user=user, start_time__range=(start_time, end_time))
     paginator = Paginator(visits, 100)
 
@@ -120,6 +122,7 @@ def visitor_visits(request, visit_id):
     pvpage = request.GET.get('pvpage', 1)
     pvspage = request.GET.get('pvspage', 1)
     visit = get_object_or_404(Visitor, pk=visit_id)
+    visit.time_on_site = timedelta(seconds=visit.time_on_site)
     pvcount = visit.pageviews.count()
     pageviews = visit.pageviews.order_by('-view_time')
     pageview_stats = visit.pageviews.values('url').annotate(views=Count('url')).order_by('-views')
@@ -131,6 +134,7 @@ def visitor_visits(request, visit_id):
         'pageviews': pvpaginator.page(pvpage),
         'pageview_stats': pvspaginator.page(pvspage),
         'pvcount': pvcount,
+        'avg_time_per_page': visit.time_on_site/pvcount if pvcount else None
     }
     return render(request, 'tracking/visitor_visits.html', context)
 
@@ -140,13 +144,14 @@ def visitor_page_detail(request, user_id):
         page_url = request.GET['page_url']
     except:
         return HttpResponseNotFound()   
+    page = request.GET.get('page', 1)
     user = get_object_or_404(get_user_model(), pk=user_id)
     aggs = Visitor.objects.filter(
         pageviews__url=page_url,
         user__pk=user_id,
-    ).values('pk').annotate(views=Count('pageciews')).aggregate(
-        Avg('pageviews__count'),
-        Sum('pageviews__count')
+    ).values('pk').annotate(views=Count('pageviews')).aggregate(
+        Avg('views'),
+        Sum('views')
     )
     visits = Visitor.objects.filter(
         pageviews__url=page_url,
@@ -155,11 +160,12 @@ def visitor_page_detail(request, user_id):
         'end_time',
         'start_time'
     )
+    paginator = Paginator(visits, 100)
 
     context = {
-        'total_views': aggs['pageviews__count__sum'],
-        'avg_views_per_visit': aggs['pageviews__count__avg'],
-        'visits': visits,
+        'total_views': aggs['views__sum'],
+        'avg_views_per_visit': aggs['views__avg'],
+        'visits': paginator.page(page),
         'user': user,
         'page_url': page_url,
     }
@@ -168,37 +174,50 @@ def visitor_page_detail(request, user_id):
 @permission_required('tracking.visitor_log')
 def visitor_pageview_detail(request, user_id, pageview_id):
     pageview = get_object_or_404(Pageview, pk=pageview_id, visitor__user_id=user_id)
+    next_pv = Pageview.objects.filter(
+        visitor__user_id=user_id,
+        view_time__gt=pageview.view_time,
+    ).order_by('view_time').first()
+    if next_pv:
+        duration = next_pv.view_time - pageview.view_time
+    else:
+        duration = None
 
     context = {
         'pageview': pageview,
+        'duration': duration,
     }
     return render(request, 'tracking/visitor_pageview_detail.html', context)
 
 @permission_required('tracking.visitor_log')
 def page_overview(request):
+    page = request.GET.get('page', 1)
     pageview_counts = Pageview.objects.values('url').annotate(views=Count('url')).order_by('-views')
+    paginator = Paginator(pageview_counts, 100)
 
     context = {
-        'pageview_counts': pageview_counts,
+        'pageview_counts': paginator.page(page),
         'total_page_views': reduce(lambda acc, c: acc + c['views'], pageview_counts, 0),
         'total_pages': len(pageview_counts),
     }
     return render(request, 'tracking/page_overview.html', context)
 
 @permission_required('tracking.visitor_log')
-def page_detail(request, page_url):
+def page_detail(request):
     try:
         page_url = request.GET['page_url']
     except:
         return HttpResponseNotFound()   
+    page = request.GET.get('page', 1)
     pageviews = Pageview.objects.filter(url=page_url).order_by('-view_time')
     pv_count = pageviews.count()
     uniqueVisitors = Pageview.objects.values('visitor_id').distinct().count()
+    paginator = Paginator(pageviews, 100)
 
     context = {
         'total_views': pv_count,
         'visitors': uniqueVisitors,
-        'pageviews': pageviews.order_by('-view_time'),
+        'pageviews': paginator.page(page),
         'page_url': page_url,
     }
     return render(request, 'tracking/page_detail.html', context)

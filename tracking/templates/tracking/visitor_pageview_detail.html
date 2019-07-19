@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>{% firstof pageview.visitor.user.get_full_name pageview.visitor.user.user %} {{ pageview.view_time|date:"Y-m-d H:i:s" }} {{ pageview.url }} Pageview - django-tracking2</title>
+<title>{% firstof pageview.visitor.user.get_full_name pageview.visitor.user.user %}'s View of {{ pageview.url }} at {{ pageview.view_time|date:"Y-m-d H:i:s" }} - django-tracking2</title>
 </head>
 <body>
-    <h1>{% firstof pageview.visitor.user.get_full_name pageview.visitor.user.user %} {{ pageview.view_time|date:"Y-m-d H:i:s" }} {{ pageview.url }} Pageview - django-tracking2</h1>
+    <h1>{% firstof pageview.visitor.user.get_full_name pageview.visitor.user.user %}'s View of {{ pageview.url }} at {{ pageview.view_time|date:"Y-m-d H:i:s" }} - django-tracking2</h1>
     <div id="tracking-stats">
         <dl>
             <dt>Method</dt>
             <dd>{{ pageview.method }}</dt>
+            <dt>Duration</dt>
+            <dd>{{ duration }}</dt>
         </dl>
     </div>
+    <a href={% url 'tracking-page-detail' %}?page_url={{ pageview.url }}>Page details across all visitors</a>
 </body>
 </html>

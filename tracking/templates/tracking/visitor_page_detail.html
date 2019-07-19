@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>{% firstof user.get_full_name user %} {{ page_url }} Visits - django-tracking2</title>
+<title>{% firstof user.get_full_name user %}'s Visits involving {{ page_url }} - django-tracking2</title>
 </head>
 <body>
-    <h1>{% firstof user.get_full_name user %} {{ page_url }} Visits - django-tracking2</h1>
+    <h1>{% firstof user.get_full_name user %}'s Visits involving {{ page_url }} - django-tracking2</h1>
     <div id="tracking-stats">
         <dl>
             <dt>Total Views</dt>
@@ -12,8 +12,14 @@
             <dt>Avg Views/Visit</dt>
             <dd>{{ avg_views_per_visit }}</dt>
         </dl>
+        {% if visits.has_previous %}
+            <a href={% url 'tracking-visitor-page-detail' user_id=user.pk %}?page_url={{ page_url }}&page={{ visits.previous_page_number }}>previous</a>
+        {% endif %}
+        {% if visits.has_next %}
+            <a href={% url 'tracking-visitor-page-detail' user_id=user.pk %}?page_url={{ page_url }}&page={{ visits.next_page_number }}>next</a>
+        {% endif %}
         <table>
-            <caption>Visits involving {{ page_url }} by {% firstof user.get_full_name user %}</caption>
+            <caption>Visits by {% firstof user.get_full_name user %} involving {{ page_url }}</caption>
             <thead>
                 <th>Start Time</th>
                 <th>End Time</th>
@@ -27,6 +33,12 @@
                 {% endfor %}
             </tbody>	    
         </table>
+        {% if visits.has_previous %}
+            <a href={% url 'tracking-visitor-page-detail' user_id=user.pk %}?page_url={{ page_url }}&page={{ visits.previous_page_number }}>previous</a>
+        {% endif %}
+        {% if visits.has_next %}
+            <a href={% url 'tracking-visitor-page-detail' user_id=user.pk %}?page_url={{ page_url }}&page={{ visits.next_page_number }}>next</a>
+        {% endif %}
     </div>
 </body>
 </html>
