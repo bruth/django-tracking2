@@ -89,7 +89,7 @@ class Pageview(models.Model):
         related_name='pageviews',
         on_delete=models.CASCADE,
     )
-    url = models.CharField(null=False, editable=False, db_index=True, max_length=2048)
+    url = models.TextField(null=False, editable=False)
     referer = models.TextField(null=True, editable=False)
     query_string = models.TextField(null=True, editable=False)
     method = models.CharField(max_length=20, null=True)
