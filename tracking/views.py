@@ -62,6 +62,8 @@ def dashboard(request):
     # queries take `date` objects (for now)
     user_stats = Visitor.objects.user_stats(start_time, end_time)
     visitor_stats = Visitor.objects.stats(start_time, end_time)
+    for us in user_stats:
+        us.time_on_site = timedelta(seconds=us.time_on_site)
     if TRACK_PAGEVIEWS:
         pageview_stats = Pageview.objects.stats(start_time, end_time)
     else:

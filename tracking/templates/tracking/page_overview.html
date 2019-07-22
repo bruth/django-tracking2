@@ -27,8 +27,8 @@
             <tbody>
                 {% for c in pageview_counts %}
                 <tr>
-                    <td><a href={% url 'tracking-page-detail' %}?page_url={{ c.url }}>{{ c.url }}</a></td>
-                    <td><a href={% url 'tracking-page-detail' %}?page_url={{ c.url }}>{{ c.views }}</a></td>
+                    <td><a href={% url 'tracking-page-detail' %}?page_url={{ c.url }} title="View all pageviews of {{ c.url }}">{{ c.url }}</a></td>
+                    <td><a href={% url 'tracking-page-detail' %}?page_url={{ c.url }} title="View all pageviews of {{ c.url }}">{{ c.views }}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>	    

@@ -27,8 +27,8 @@
             <tbody>
                 {% for visit in visits %}
                 <tr>
-                    <td><a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}>{{ visit.start_time|date:"Y-m-d H:i:s" }}</a></td>
-                    <td><a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}>{{ visit.end_time|date:"Y-m-d H:i:s" }}</a></td>
+                    <td><a href={% url 'tracking-visitor-visits' visit_id=visit.pk %} title="View details of visit">{{ visit.start_time|date:"Y-m-d H:i:s" }}</a></td>
+                    <td><a href={% url 'tracking-visitor-visits' visit_id=visit.pk %} title="View details of visit">{{ visit.end_time|date:"Y-m-d H:i:s" }}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>	    
