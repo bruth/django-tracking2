@@ -13,10 +13,10 @@
             <dd>{{ total_pages }}</dt>
         </dl>
         {% if pageview_counts.has_previous %}
-            <a href={% url 'tracking-visitor-page-overview' %}?page_url={{ page_url }}&page={{ pageview_counts.previous_page_number }}>previous</a>
+            <a href={% url 'tracking-page-overview' %}?page_url={{ page_url }}&page={{ pageview_counts.previous_page_number }}>previous</a>
         {% endif %}
         {% if pageview_counts.has_next %}
-            <a href={% url 'tracking-visitor-page-overview' %}?page_url={{ page_url }}&page={{ pageview_counts.next_page_number }}>next</a>
+            <a href={% url 'tracking-page-overview' %}?page_url={{ page_url }}&page={{ pageview_counts.next_page_number }}>next</a>
         {% endif %}
         <table>
             <caption>Pages</caption>
@@ -34,10 +34,10 @@
             </tbody>	    
         </table>
         {% if pageview_counts.has_previous %}
-            <a href={% url 'tracking-visitor-page-overview' %}?page_url={{ page_url }}&page={{ pageview_counts.previous_page_number }}>previous</a>
+            <a href={% url 'tracking-page-overview' %}?page_url={{ page_url }}&page={{ pageview_counts.previous_page_number }}>previous</a>
         {% endif %}
         {% if pageview_counts.has_next %}
-            <a href={% url 'tracking-visitor-page-overview' %}?page_url={{ page_url }}&page={{ pageview_counts.next_page_number }}>next</a>
+            <a href={% url 'tracking-page-overview' %}?page_url={{ page_url }}&page={{ pageview_counts.next_page_number }}>next</a>
         {% endif %}
     </div>
 </body>
