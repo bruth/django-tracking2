@@ -167,8 +167,6 @@ class VisitorManager(CacheManager):
             user_kwargs['visit_history__start_time__isnull'] = False
             visit_kwargs['start_time__isnull'] = False
             
-        log.critical(visit_kwargs)
-
         users = get_user_model().objects.filter(**user_kwargs).annotate(
             visit_count=Count('visit_history', distinct=True),
             time_on_site=Avg('visit_history__time_on_site'),

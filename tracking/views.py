@@ -146,19 +146,43 @@ def visitor_page_detail(request, user_id):
         page_url = request.GET['page_url']
     except:
         return HttpResponseNotFound()   
+
+    end_time = now()
+    start_time = end_time - timedelta(days=7)
+    defaults = {'start': start_time, 'end': end_time}
+
+    form = DashboardForm(data=(request.GET if 'end' in request.GET else None) or defaults)
+    if form.is_valid():
+        start_time = form.cleaned_data['start']
+        end_time = form.cleaned_data['end']
+ 
+    # determine when tracking began
+    try:
+        obj = Visitor.objects.order_by('start_time')[0]
+        track_start_time = obj.start_time
+    except (IndexError, Visitor.DoesNotExist):
+        track_start_time = now()
+ 
+    # If the start_date is before tracking began, warn about incomplete data
+    warn_incomplete = (start_time < track_start_time)
+
     page = request.GET.get('page', 1)
     user = get_object_or_404(get_user_model(), pk=user_id)
-    aggs = Visitor.objects.filter(
+    relevant_visits = Visitor.objects.filter(
         pageviews__url=page_url,
         user__pk=user_id,
-    ).values('pk').annotate(views=Count('pageviews')).aggregate(
+        start_time__lt=end_time,
+    )
+    if start_time:
+        relevant_visits = relevant_visits.filter(start_time__gte=start_time)
+    else:
+        relevant_visits = relevant_visits.filter(start_time__isnull=False)
+    
+    aggs = relevant_visits.values('pk').annotate(views=Count('pageviews')).aggregate(
         Avg('views'),
         Sum('views')
     )
-    visits = Visitor.objects.filter(
-        pageviews__url=page_url,
-        user__pk=user_id,
-    ).distinct().order_by(
+    visits = relevant_visits.distinct().order_by(
         'end_time',
         'start_time'
     )
@@ -170,6 +194,9 @@ def visitor_page_detail(request, user_id):
         'visits': paginator.page(page),
         'user': user,
         'page_url': page_url,
+        'form': form,
+        'track_start_time': track_start_time,
+        'warn_incomplete': warn_incomplete,
     }
     return render(request, 'tracking/visitor_page_detail.html', context)
 
@@ -193,14 +220,39 @@ def visitor_pageview_detail(request, user_id, pageview_id):
 
 @permission_required('tracking.visitor_log')
 def page_overview(request):
+    end_time = now()
+    start_time = end_time - timedelta(days=7)
+    defaults = {'start': start_time, 'end': end_time}
+
+    form = DashboardForm(data=request.GET or defaults)
+    if form.is_valid():
+        start_time = form.cleaned_data['start']
+        end_time = form.cleaned_data['end']
+
+    # determine when tracking began
+    try:
+        obj = Visitor.objects.order_by('start_time')[0]
+        track_start_time = obj.start_time
+    except (IndexError, Visitor.DoesNotExist):
+        track_start_time = now()
+
+    # If the start_date is before tracking began, warn about incomplete data
+    warn_incomplete = (start_time < track_start_time)
+
     page = request.GET.get('page', 1)
-    pageview_counts = Pageview.objects.values('url').annotate(views=Count('url')).order_by('-views')
+    relevant_pvs = Pageview.objects.filter(view_time__lt=end_time)
+    if start_time:
+        relevant_pvs = relevant_pvs.filter(view_time__gte=start_time)
+    pageview_counts = relevant_pvs.values('url').annotate(views=Count('url')).order_by('-views')
     paginator = Paginator(pageview_counts, 100)
 
     context = {
         'pageview_counts': paginator.page(page),
         'total_page_views': reduce(lambda acc, c: acc + c['views'], pageview_counts, 0),
         'total_pages': len(pageview_counts),
+        'form': form,
+        'track_start_time': track_start_time,
+        'warn_incomplete': warn_incomplete,
     }
     return render(request, 'tracking/page_overview.html', context)
 
@@ -210,10 +262,33 @@ def page_detail(request):
         page_url = request.GET['page_url']
     except:
         return HttpResponseNotFound()   
+
+    end_time = now()
+    start_time = end_time - timedelta(days=7)
+    defaults = {'start': start_time, 'end': end_time}
+
+    form = DashboardForm(data=(request.GET if 'end' in request.GET else None) or defaults)
+    if form.is_valid():
+        start_time = form.cleaned_data['start']
+        end_time = form.cleaned_data['end']
+ 
+    # determine when tracking began
+    try:
+        obj = Visitor.objects.order_by('start_time')[0]
+        track_start_time = obj.start_time
+    except (IndexError, Visitor.DoesNotExist):
+        track_start_time = now()
+ 
+    # If the start_date is before tracking began, warn about incomplete data
+    warn_incomplete = (start_time < track_start_time)
+
     page = request.GET.get('page', 1)
-    pageviews = Pageview.objects.filter(url=page_url).order_by('-view_time')
+    relevant_pvs = Pageview.objects.filter(view_time__lt=end_time)
+    if start_time:
+        relevant_pvs = relevant_pvs.filter(view_time__gte=start_time)
+    pageviews = relevant_pvs.filter(url=page_url).order_by('-view_time')
     pv_count = pageviews.count()
-    uniqueVisitors = Pageview.objects.values('visitor_id').distinct().count()
+    uniqueVisitors = relevant_pvs.values('visitor_id').distinct().count()
     paginator = Paginator(pageviews, 100)
 
     context = {
@@ -221,5 +296,8 @@ def page_detail(request):
         'visitors': uniqueVisitors,
         'pageviews': paginator.page(page),
         'page_url': page_url,
+        'form': form,
+        'track_start_time': track_start_time,
+        'warn_incomplete': warn_incomplete,
     }
     return render(request, 'tracking/page_detail.html', context)

@@ -5,6 +5,13 @@
 </head>
 <body>
     <h1>{% firstof user.get_full_name user %}'s Visits involving {{ page_url }} - django-tracking2</h1>
+    <div id="tracking-filters">
+        <form method="GET">
+            <input type="hidden" name="page_url" value={{ page_url }} />
+            {{ form.as_table }}
+            <input type="submit" name="submit" value="submit" />
+        </form>
+    </div>
     <div id="tracking-stats">
         <dl>
             <dt>Total Views</dt>
