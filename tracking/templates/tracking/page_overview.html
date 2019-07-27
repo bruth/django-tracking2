@@ -19,10 +19,10 @@
             <dd>{{ total_pages }}</dt>
         </dl>
         {% if pageview_counts.has_previous %}
-            <a href={% url 'tracking-page-overview' %}?page={{ pageview_counts.previous_page_number }}>previous</a>
+            <a href="{% url 'tracking-page-overview' %}?page={{ pageview_counts.previous_page_number }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}">previous</a>
         {% endif %}
         {% if pageview_counts.has_next %}
-            <a href={% url 'tracking-page-overview' %}?page={{ pageview_counts.next_page_number }}>next</a>
+            <a href="{% url 'tracking-page-overview' %}?page={{ pageview_counts.next_page_number }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}">next</a>
         {% endif %}
         <table>
             <caption>Pages</caption>
@@ -33,17 +33,17 @@
             <tbody>
                 {% for c in pageview_counts %}
                 <tr>
-                    <td><a href={% url 'tracking-page-detail' %}?page_url={{ c.url }} title="View all pageviews of {{ c.url }}">{{ c.url }}</a></td>
-                    <td><a href={% url 'tracking-page-detail' %}?page_url={{ c.url }} title="View all pageviews of {{ c.url }}">{{ c.views }}</a></td>
+                    <td><a href="{% url 'tracking-page-detail' %}?page_url={{ c.url }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}" title="View all pageviews of {{ c.url }}">{{ c.url }}</a></td>
+                    <td><a href="{% url 'tracking-page-detail' %}?page_url={{ c.url }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}" title="View all pageviews of {{ c.url }}">{{ c.views }}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>	    
         </table>
         {% if pageview_counts.has_previous %}
-            <a href={% url 'tracking-page-overview' %}?page={{ pageview_counts.previous_page_number }}>previous</a>
+            <a href="{% url 'tracking-page-overview' %}?page={{ pageview_counts.previous_page_number }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}">previous</a>
         {% endif %}
         {% if pageview_counts.has_next %}
-            <a href={% url 'tracking-page-overview' %}?page={{ pageview_counts.next_page_number }}>next</a>
+            <a href="{% url 'tracking-page-overview' %}?page={{ pageview_counts.next_page_number }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}">next</a>
         {% endif %}
     </div>
 </body>

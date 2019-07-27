@@ -76,6 +76,8 @@ def dashboard(request):
         'user_stats': user_stats,
         'visitor_stats': visitor_stats,
         'pageview_stats': pageview_stats,
+        'start_time': start_time,
+        'end_time': end_time,
     }
     return render(request, 'tracking/dashboard.html', context)
 
@@ -116,6 +118,8 @@ def visitor_overview(request, user_id):
         'warn_incomplete': warn_incomplete,
         'visits': paginator.page(page),
         'user': user,
+        'start_time': start_time,
+        'end_time': end_time,
     }
     return render(request, 'tracking/visitor_overview.html', context)
 
@@ -197,6 +201,8 @@ def visitor_page_detail(request, user_id):
         'form': form,
         'track_start_time': track_start_time,
         'warn_incomplete': warn_incomplete,
+        'start_time': start_time,
+        'end_time': end_time,
     }
     return render(request, 'tracking/visitor_page_detail.html', context)
 
@@ -253,6 +259,8 @@ def page_overview(request):
         'form': form,
         'track_start_time': track_start_time,
         'warn_incomplete': warn_incomplete,
+        'start_time': start_time,
+        'end_time': end_time,
     }
     return render(request, 'tracking/page_overview.html', context)
 
@@ -299,5 +307,7 @@ def page_detail(request):
         'form': form,
         'track_start_time': track_start_time,
         'warn_incomplete': warn_incomplete,
+        'start_time': start_time,
+        'end_time': end_time,
     }
     return render(request, 'tracking/page_detail.html', context)

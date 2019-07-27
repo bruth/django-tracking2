@@ -34,10 +34,10 @@
       </dl>
       
         {% if visits.has_previous %}
-            <a href={% url 'tracking-visitor-overview' user_id=user.pk %}?page={{ visits.previous_page_number }}>previous</a>
+            <a href="{% url 'tracking-visitor-overview' user_id=user.pk %}?page={{ visits.previous_page_number }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}">previous</a>
         {% endif %}
         {% if visits.has_next %}
-            <a href={% url 'tracking-visitor-overview' user_id=user.pk %}?page={{ visits.next_page_number }}>next</a>
+            <a href="{% url 'tracking-visitor-overview' user_id=user.pk %}?page={{ visits.next_page_number }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}">next</a>
         {% endif %}
         <table>
             <caption>Visits by {% firstof user.get_full_name user %}</caption>
@@ -48,17 +48,17 @@
             <tbody>
                 {% for visit in visits %}
                 <tr>
-                    <td><a href={% url 'tracking-visitor-visits' visit_id=visit.pk %} title="Click to see visit details">{{ visit.start_time|date:"Y-m-d H:i:s" }}</a></td>
-                    <td><a href={% url 'tracking-visitor-visits' visit_id=visit.pk %} title="Click to see visit details">{{ visit.end_time|date:"Y-m-d H:i:s" }}</a></td>
+                    <td><a href="{% url 'tracking-visitor-visits' visit_id=visit.pk %}" title="Click to see visit details">{{ visit.start_time|date:"Y-m-d H:i:s" }}</a></td>
+                    <td><a href="{% url 'tracking-visitor-visits' visit_id=visit.pk %}" title="Click to see visit details">{{ visit.end_time|date:"Y-m-d H:i:s" }}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>	    
         </table>
         {% if visits.has_previous %}
-            <a href={% url 'tracking-visitor-overview' user_id=user.pk %}?page={{ visits.previous_page_number }}>previous</a>
+            <a href="{% url 'tracking-visitor-overview' user_id=user.pk %}?page={{ visits.previous_page_number }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}">previous</a>
         {% endif %}
         {% if visits.has_next %}
-            <a href={% url 'tracking-visitor-overview' user_id=user.pk %}?page={{ visits.next_page_number }}>next</a>
+            <a href="{% url 'tracking-visitor-overview' user_id=user.pk %}?page={{ visits.next_page_number }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}">next</a>
         {% endif %}
     </div>
 </body>
