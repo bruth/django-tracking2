@@ -11,6 +11,10 @@
             <dd>{{ pageview.method }}</dt>
             <dt>Duration</dt>
             <dd>{{ duration }}</dt>
+            {% if pageview.query_string %}
+                <dt>Query String</dt>
+                <dd>{{ pageview.querystring }}</dt>
+            {% endif %}
         </dl>
     </div>
     <a href={% url 'tracking-page-detail' %}?page_url={{ pageview.url }}>Page details across all visitors</a>

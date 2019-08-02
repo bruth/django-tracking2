@@ -10,7 +10,7 @@
             <dt>Duration</dt>
             <dd>{{ visit.time_on_site }}</dt>
             <dt># of Page Views</dt>
-            <dd>{{ pvcount }}</dt>
+            <dd>{{ pvcount|default:"n/a" }}</dt>
             <dt>Avg Time/Page</dt>
             <dd>{{ avg_time_per_page|default_if_none:"n/a" }}</dt>
             <dt>IP</dt>
@@ -18,61 +18,67 @@
             <dt>User Agent</dt>
             <dd>{{ visit.user_agent }}</dt>
         </dl>
-        {% if pageview_stats.has_previous %}
-            <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.number }}&pvspage={{ pageview_stats.previous_page_number }}>previous</a>
-        {% endif %}
-        {% if pageview_stats.has_next %}
-            <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.number }}&pvspage={{ pageview_stats.next_page_number }}>next</a>
-        {% endif %}
-        <table>
-            <caption>Views/Page</caption>
-            <thead>
-                <th>URL</th>
-                <th># of views</th>
-            </thead>
-            <tbody>
-            {% for stat in pageview_stats %}
-                <tr>
-                    <td><a href={% url 'tracking-visitor-page-detail' user_id=visit.user.pk %}?page_url={{ stat.url }} title="View visits by {% firstof visit.user.get_full_name visit.user %} involving {{ stat.url }}">{{ stat.url }}</a></td>
-                    <td>{{ stat.views }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        {% if pageview_stats.has_previous %}
-            <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.number }}&pvspage={{ pageview_stats.previous_page_number }}>previous</a>
-        {% endif %}
-        {% if pageview_stats.has_next %}
-            <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.number }}&pvspage={{ pageview_stats.next_page_number }}>next</a>
-        {% endif %}
-      
-        {% if pageviews.has_previous %}
-            <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.previous_page_number }}&pvspage={{ pageview_stats.number }}>previous</a>
-        {% endif %}
-        {% if pageviews.has_next %}
-            <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.next_page_number }}&pvspage={{ pageview_stats.number }}>next</a>
-        {% endif %}
-        <table>
-            <caption>Page Views</caption>
-            <thead>
-                <th>Time</th>
-                <th>URL</th>
-            </thead>
-            <tbody>
-                {% for view in pageviews %}
-                <tr>
-                    <td>{{ view.view_time|date:"Y-m-d H:i:s" }}</td>
-                    <td><a href={% url 'tracking-pageview-detail' user_id=visit.user.pk pageview_id=view.pk %} title="View pageview details">{{ view.url }}</a></td>
-                </tr>
-                {% endfor %}
-            </tbody>	    
-        </table>
-        {% if pageviews.has_previous %}
-            <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.previous_page_number }}&pvspage={{ pageview_stats.number }}>previous</a>
-        {% endif %}
-        {% if pageviews.has_next %}
-            <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.next_page_number }}&pvspage={{ pageview_stats.number }}>next</a>
-        {% endif %}
+        {% if pageview_stats.count %)
+            <div id="tracking2-views-per-page">
+                {% if pageview_stats.has_previous %}
+                    <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.number }}&pvspage={{ pageview_stats.previous_page_number }}>previous</a>
+                {% endif %}
+                {% if pageview_stats.has_next %}
+                    <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.number }}&pvspage={{ pageview_stats.next_page_number }}>next</a>
+                {% endif %}
+                <table>
+                    <caption>Views/Page</caption>
+                    <thead>
+                        <th>URL</th>
+                        <th># of views</th>
+                    </thead>
+                    <tbody>
+                    {% for stat in pageview_stats %}
+                        <tr>
+                            <td><a href={% url 'tracking-visitor-page-detail' user_id=visit.user.pk %}?page_url={{ stat.url }} title="View visits by {% firstof visit.user.get_full_name visit.user %} involving {{ stat.url }}">{{ stat.url }}</a></td>
+                            <td>{{ stat.views }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% if pageview_stats.has_previous %}
+                    <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.number }}&pvspage={{ pageview_stats.previous_page_number }}>previous</a>
+                {% endif %}
+                {% if pageview_stats.has_next %}
+                    <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.number }}&pvspage={{ pageview_stats.next_page_number }}>next</a>
+                {% endif %}
+            </div>
+          
+            <div id="tracking2-visitor-pageviews">
+                {% if pageviews.has_previous %}
+                    <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.previous_page_number }}&pvspage={{ pageview_stats.number }}>previous</a>
+                {% endif %}
+                {% if pageviews.has_next %}
+                    <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.next_page_number }}&pvspage={{ pageview_stats.number }}>next</a>
+                {% endif %}
+                <table>
+                    <caption>Page Views</caption>
+                    <thead>
+                        <th>Time</th>
+                        <th>URL</th>
+                    </thead>
+                    <tbody>
+                        {% for view in pageviews %}
+                        <tr>
+                            <td>{{ view.view_time|date:"Y-m-d H:i:s" }}</td>
+                            <td><a href={% url 'tracking-pageview-detail' user_id=visit.user.pk pageview_id=view.pk %} title="View pageview details">{{ view.url }}</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>	    
+                </table>
+                {% if pageviews.has_previous %}
+                    <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.previous_page_number }}&pvspage={{ pageview_stats.number }}>previous</a>
+                {% endif %}
+                {% if pageviews.has_next %}
+                    <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.next_page_number }}&pvspage={{ pageview_stats.number }}>next</a>
+                {% endif %}
+            </div>
+        {% endif %)
     </div>
 </body>
 </html>

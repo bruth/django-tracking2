@@ -21,3 +21,5 @@ if hasattr(settings, 'TRACKING_USE_GEOIP'):
 TRACK_REFERER = getattr(settings, 'TRACK_REFERER', False)
 
 TRACK_QUERY_STRING = getattr(settings, 'TRACK_QUERY_STRING', False)
+
+TRACKING2_PAGING_SIZE = getattr(settings, 'TRACKING2_PAGING_SIZE', 100)

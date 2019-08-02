@@ -5,12 +5,7 @@
 </head>
 <body>
     <h1>Page Overview - django-tracking2</h1>
-    <div id="tracking-filters">
-        <form method="GET">
-            {{ form.as_table }}
-            <input type="submit" name="submit" value="submit" />
-        </form>
-    </div>
+    {% include "tracking/snippets/tracking_filters.html" %}
     <div id="tracking-stats">
         <dl>
             <dt>Total Page Views</dt>
