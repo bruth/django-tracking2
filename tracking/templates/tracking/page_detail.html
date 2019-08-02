@@ -19,10 +19,10 @@
             <dt># of Unique Visitors</dt>
             <dd>{{ visitors }}</dt>
         </dl>
-        {% if pageview_counts.has_previous %}
+        {% if pageviews.has_previous %}
             <a href={% url 'tracking-page-detail' %}?page_url={{ page_url }}&page={{ pageviews.previous_page_number }}>previous</a>
         {% endif %}
-        {% if pageview_counts.has_next %}
+        {% if pageviews.has_next %}
             <a href={% url 'tracking-page-detail' %}?page_url={{ page_url }}&page={{ pageviews.next_page_number }}>next</a>
         {% endif %}
         <table>
@@ -35,17 +35,17 @@
             <tbody>
                 {% for pv in pageviews %}
                 <tr>
-                    <td><a href={% url 'tracking-visitor-page-detail' user_id=pv.visitor.user.pk %}?page_url={{ page_url }} title="View visits by {% firstof user.get_full_name user %} involving {{ page_url }}">{{ pv.view_time|date:"Y-m-d H:i:s" }}</a></td>
-                    <td><a href={% url 'tracking-visitor-page-detail' user_id=pv.visitor.user.pk %}?page_url={{ page_url }} title="View visits by {% firstof user.get_full_name user %} involving {{ page_url }}">{% firstof user.get_full_name user %}</a></td>
-                    <td><a href={% url 'tracking-visitor-page-detail' user_id=pv.visitor.user.pk %}?page_url={{ page_url }} title="View visits by {% firstof user.get_full_name user %} involving {{ page_url }}">{{ page_url }}</a></td>
+                    <td><a href={% url 'tracking-visitor-page-detail' user_id=pv.visitor.user.pk %}?page_url={{ page_url }} title="View visits by {% firstof pv.visitor.user.get_full_name pv.visitor.user %} involving {{ page_url }}">{{ pv.view_time|date:"Y-m-d H:i:s" }}</a></td>
+                    <td><a href={% url 'tracking-visitor-page-detail' user_id=pv.visitor.user.pk %}?page_url={{ page_url }} title="View visits by {% firstof pv.visitor.user.get_full_name pv.visitor.user %} involving {{ page_url }}">{% firstof pv.visitor.user.get_full_name pv.visitor.user %}</a></td>
+                    <td><a href={% url 'tracking-visitor-page-detail' user_id=pv.visitor.user.pk %}?page_url={{ page_url }} title="View visits by {% firstof pv.visitor.user.get_full_name pv.visitor.user %} involving {{ page_url }}">{{ page_url }}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>	    
         </table>
-        {% if pageview_counts.has_previous %}
+        {% if pageviews.has_previous %}
             <a href={% url 'tracking-page-detail' %}?page_url={{ page_url }}&page={{ pageviews.previous_page_number }}>previous</a>
         {% endif %}
-        {% if pageview_counts.has_next %}
+        {% if pageviews.has_next %}
             <a href={% url 'tracking-page-detail' %}?page_url={{ page_url }}&page={{ pageviews.next_page_number }}>next</a>
         {% endif %}
     </div>
