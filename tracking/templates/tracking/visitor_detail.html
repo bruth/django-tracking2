@@ -18,13 +18,13 @@
             <dt>User Agent</dt>
             <dd>{{ visit.user_agent }}</dt>
         </dl>
-        {% if pageview_stats.count %)
+        {% if pvcount %}
             <div id="tracking2-views-per-page">
                 {% if pageview_stats.has_previous %}
-                    <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.number }}&pvspage={{ pageview_stats.previous_page_number }}>previous</a>
+                    <a href={% url 'tracking-visitor-detail' visit_id=visit.pk %}?pvpage={{ pageviews.number }}&pvspage={{ pageview_stats.previous_page_number }}>previous</a>
                 {% endif %}
                 {% if pageview_stats.has_next %}
-                    <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.number }}&pvspage={{ pageview_stats.next_page_number }}>next</a>
+                    <a href={% url 'tracking-visitor-detail' visit_id=visit.pk %}?pvpage={{ pageviews.number }}&pvspage={{ pageview_stats.next_page_number }}>next</a>
                 {% endif %}
                 <table>
                     <caption>Views/Page</caption>
@@ -42,19 +42,19 @@
                     </tbody>
                 </table>
                 {% if pageview_stats.has_previous %}
-                    <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.number }}&pvspage={{ pageview_stats.previous_page_number }}>previous</a>
+                    <a href={% url 'tracking-visitor-detail' visit_id=visit.pk %}?pvpage={{ pageviews.number }}&pvspage={{ pageview_stats.previous_page_number }}>previous</a>
                 {% endif %}
                 {% if pageview_stats.has_next %}
-                    <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.number }}&pvspage={{ pageview_stats.next_page_number }}>next</a>
+                    <a href={% url 'tracking-visitor-detail' visit_id=visit.pk %}?pvpage={{ pageviews.number }}&pvspage={{ pageview_stats.next_page_number }}>next</a>
                 {% endif %}
             </div>
           
             <div id="tracking2-visitor-pageviews">
                 {% if pageviews.has_previous %}
-                    <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.previous_page_number }}&pvspage={{ pageview_stats.number }}>previous</a>
+                    <a href={% url 'tracking-visitor-detail' visit_id=visit.pk %}?pvpage={{ pageviews.previous_page_number }}&pvspage={{ pageview_stats.number }}>previous</a>
                 {% endif %}
                 {% if pageviews.has_next %}
-                    <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.next_page_number }}&pvspage={{ pageview_stats.number }}>next</a>
+                    <a href={% url 'tracking-visitor-detail' visit_id=visit.pk %}?pvpage={{ pageviews.next_page_number }}&pvspage={{ pageview_stats.number }}>next</a>
                 {% endif %}
                 <table>
                     <caption>Page Views</caption>
@@ -72,13 +72,13 @@
                     </tbody>	    
                 </table>
                 {% if pageviews.has_previous %}
-                    <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.previous_page_number }}&pvspage={{ pageview_stats.number }}>previous</a>
+                    <a href={% url 'tracking-visitor-detail' visit_id=visit.pk %}?pvpage={{ pageviews.previous_page_number }}&pvspage={{ pageview_stats.number }}>previous</a>
                 {% endif %}
                 {% if pageviews.has_next %}
-                    <a href={% url 'tracking-visitor-visits' visit_id=visit.pk %}?pvpage={{ pageviews.next_page_number }}&pvspage={{ pageview_stats.number }}>next</a>
+                    <a href={% url 'tracking-visitor-detail' visit_id=visit.pk %}?pvpage={{ pageviews.next_page_number }}&pvspage={{ pageview_stats.number }}>next</a>
                 {% endif %}
             </div>
-        {% endif %)
+        {% endif %}
     </div>
 </body>
 </html>

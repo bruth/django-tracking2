@@ -16,7 +16,7 @@ from django.core.paginator import Paginator
 from tracking.models import Visitor, Pageview
 from tracking.settings import (
     TRACK_PAGEVIEWS,
-    TRACKING2_PAGING_SIZE,
+    TRACK_PAGING_SIZE,
     TRACK_USING_GEOIP,
 )
 from tracking.utils import processTimeRangeForm
@@ -58,7 +58,7 @@ def visitor_overview(request, user_id):
     if user:
         user.time_on_site = timedelta(seconds=user.time_on_site)
     visits = Visitor.objects.filter(user=user, start_time__range=(start_time, end_time))
-    paginator = Paginator(visits, TRACKING2_PAGING_SIZE)
+    paginator = Paginator(visits, TRACK_PAGING_SIZE)
 
     context = {
         'form': form,
@@ -71,7 +71,7 @@ def visitor_overview(request, user_id):
     return render(request, 'tracking/visitor_overview.html', context)
 
 @permission_required('tracking.visitor_log')
-def visitor_visits(request, visit_id):
+def visitor_detail(request, visit_id):
     pvpage = request.GET.get('pvpage', 1)
     pvspage = request.GET.get('pvspage', 1)
     visit = get_object_or_404(Visitor, pk=visit_id)
@@ -79,8 +79,8 @@ def visitor_visits(request, visit_id):
     pvcount = visit.pageviews.count()
     pageviews = visit.pageviews.order_by('-view_time')
     pageview_stats = visit.pageviews.values('url').annotate(views=Count('url')).order_by('-views')
-    pvspaginator = Paginator(pageview_stats, TRACKING2_PAGING_SIZE)
-    pvpaginator = Paginator(pageviews, TRACKING2_PAGING_SIZE)
+    pvspaginator = Paginator(pageview_stats, TRACK_PAGING_SIZE)
+    pvpaginator = Paginator(pageviews, TRACK_PAGING_SIZE)
 
     context = {
         'visit': visit,
@@ -89,7 +89,7 @@ def visitor_visits(request, visit_id):
         'pvcount': pvcount,
         'avg_time_per_page': visit.time_on_site/pvcount if pvcount else None
     }
-    return render(request, 'tracking/visitor_visits.html', context)
+    return render(request, 'tracking/visitor_detail.html', context)
 
 @permission_required('tracking.visitor_log')
 def visitor_page_detail(request, user_id):
@@ -120,7 +120,7 @@ def visitor_page_detail(request, user_id):
         'end_time',
         'start_time'
     )
-    paginator = Paginator(visits, TRACKING2_PAGING_SIZE)
+    paginator = Paginator(visits, TRACK_PAGING_SIZE)
 
     context = {
         'total_views': aggs['views__sum'],
@@ -131,6 +131,7 @@ def visitor_page_detail(request, user_id):
         'form': form,
         'track_start_time': track_start_time,
         'warn_incomplete': warn_incomplete,
+        'has_geoip': TRACK_USING_GEOIP,
     }
     return render(request, 'tracking/visitor_page_detail.html', context)
 
@@ -161,12 +162,11 @@ def page_overview(request):
     if start_time:
         relevant_pvs = relevant_pvs.filter(view_time__gte=start_time)
     pageview_counts = relevant_pvs.values('url').annotate(views=Count('url')).order_by('-views')
-    paginator = Paginator(pageview_counts, TRACKING2_PAGING_SIZE)
+    paginator = Paginator(pageview_counts, TRACK_PAGING_SIZE)
 
     context = {
         'pageview_counts': paginator.page(page),
         'total_page_views': reduce(lambda acc, c: acc + c['views'], pageview_counts, 0),
-
         'total_pages': len(pageview_counts),
         'form': form,
         'track_start_time': track_start_time,
@@ -190,7 +190,7 @@ def page_detail(request):
     pageviews = relevant_pvs.filter(url=page_url).order_by('-view_time')
     pv_count = pageviews.count()
     uniqueVisitors = relevant_pvs.values('visitor_id').distinct().count()
-    paginator = Paginator(pageviews, TRACKING2_PAGING_SIZE)
+    paginator = Paginator(pageviews, TRACK_PAGING_SIZE)
 
     context = {
         'total_views': pv_count,

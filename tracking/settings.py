@@ -22,4 +22,4 @@ TRACK_REFERER = getattr(settings, 'TRACK_REFERER', False)
 
 TRACK_QUERY_STRING = getattr(settings, 'TRACK_QUERY_STRING', False)
 
-TRACKING2_PAGING_SIZE = getattr(settings, 'TRACKING2_PAGING_SIZE', 100)
+TRACK_PAGING_SIZE = getattr(settings, 'TRACK_PAGING_SIZE', 100)

@@ -34,10 +34,10 @@
             <tbody>
                 {% for visit in visits %}
                 <tr>
-                    <td><a href={% url 'tracking-visitor-visits' visit_id=visit.pk %} title="Click to see visit details">{{ visit.start_time|date:"Y-m-d H:i:s" }}</a></td>
-                    <td><a href={% url 'tracking-visitor-visits' visit_id=visit.pk %} title="Click to see visit details">{{ visit.end_time|date:"Y-m-d H:i:s" }}</a></td>
+                    <td><a href={% url 'tracking-visitor-detail' visit_id=visit.pk %} title="Click to see visit details">{{ visit.start_time|date:"Y-m-d H:i:s" }}</a></td>
+                    <td><a href={% url 'tracking-visitor-detail' visit_id=visit.pk %} title="Click to see visit details">{{ visit.end_time|date:"Y-m-d H:i:s" }}</a></td>
                     {% if has_geoip %}
-                        <td><a href={% url 'tracking-visitor-visits' visit_id=visit.pk %} title="Click to see visit details">{{ visit.geoip_data.city }}, {{ visit.geoip_data.region }}, {{ visit.geoip_data.country_code }} {{ visit.geoip_data.postal_code }}</a></td>
+                        <td><a href={% url 'tracking-visitor-detail' visit_id=visit.pk %} title="Click to see visit details">{{ visit.geoip_data.city }}, {{ visit.geoip_data.region }}, {{ visit.geoip_data.country_code }} {{ visit.geoip_data.postal_code }}</a></td>
                     {% endif %}
                 </tr>
                 {% endfor %}

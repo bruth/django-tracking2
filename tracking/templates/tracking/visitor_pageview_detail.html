@@ -11,9 +11,13 @@
             <dd>{{ pageview.method }}</dt>
             <dt>Duration</dt>
             <dd>{{ duration }}</dt>
+            {% if pageview.referer %}
+                <dt>Referrer</dt>
+                <dd>{{ pageview.referer }}</dt>
+            {% endif %}
             {% if pageview.query_string %}
                 <dt>Query String</dt>
-                <dd>{{ pageview.querystring }}</dt>
+                <dd>{{ pageview.query_string }}</dt>
             {% endif %}
         </dl>
     </div>
