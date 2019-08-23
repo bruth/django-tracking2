@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
@@ -11,7 +11,7 @@ except ImportError:
     from mock import patch
 
 from tracking.admin import VisitorAdmin
-from tracking.models import Visitor
+from tracking.models import Visitor, Pageview
 
 
 class ViewsTestCase(TestCase):
@@ -97,6 +97,12 @@ class ViewsTestCase(TestCase):
             '/tracking/visitors/%s/?start=2014-11&end=2014-12-01' % self.user.pk)
         self.assertEqual(response.status_code, 200)
 
+    def test_visitor_overview_no_records(self):
+        response = self.client.get(
+            '/tracking/visitors/%s/?start=2014-11&end=2014-12-01' % self.user.pk)
+        # Gracefully handle when then there are o records of visits within time range
+        self.assertEqual(response.status_code, 200)
+
     def test_visitor_overview_times_bad(self):
         # make a non PAGEVIEW tracking request
         Visitor.objects.create(
@@ -110,6 +116,191 @@ class ViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Enter a valid date/time.')
 
+    def test_visitor_detail_visitor_does_not_exist(self):
+        response = self.client.get(
+            '/tracking/visits/asdf/')
+        self.assertEqual(response.status_code, 404)
+
+    def test_visitor_detail_no_pageviews(self):
+        Visitor.objects.create(
+            session_key='skey',
+            ip_address='127.0.0.1',
+            user=self.user,
+            time_on_site = 0,
+        )
+        response = self.client.get(
+            '/tracking/visits/%s/' % self.user.pk)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['pvcount'], 0)
+
+    def test_visitor_detail_has_pageview(self):
+        visitor = Visitor.objects.create(
+            session_key='skey',
+            ip_address='127.0.0.1',
+            user=self.user,
+            time_on_site = 0,
+        )
+        Pageview.objects.create(
+            visitor=visitor,
+            url='/an/url',
+            referer='/an/url',
+            query_string='?a=string',
+            method='PUT',
+            view_time=datetime.fromtimestamp(1565033030),
+        )
+        response = self.client.get(
+            '/tracking/visits/%s/?start=2018&end=2020' % self.user.pk)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['pageviews'].count(), 1)
+        self.assertEqual(response.context['pageview_stats'].count(), 1)
+        self.assertEqual(response.context['pvcount'], 1)
+        self.assertEqual(response.context['visit'], visitor)
+
+    def test_visitor_page_detail_page_does_not_exist(self):
+        visitor = Visitor.objects.create(
+            session_key='skey',
+            ip_address='127.0.0.1',
+            user=self.user,
+            time_on_site = 0,
+        )
+        response = self.client.get(
+            '/tracking/visitors/%s/page/?page_url=asdf/' % self.user.pk)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['visits'].count(), 0)
+        self.assertEqual(response.context['total_views'], 0)
+        self.assertEqual(response.context['avg_views_per_visit'], 0)
+        self.assertEqual(response.context['visits'].count(), 1)
+        self.assertEqual(response.context['user'], self.user)
+
+    def test_visitor_page_detail_user_does_not_exist(self):
+        visitor = Visitor.objects.create(
+            session_key='skey',
+            ip_address='127.0.0.1',
+            user=self.user,
+            time_on_site = 0,
+        )
+        pv = Pageview.objects.create(
+            visitor=visitor,
+            url='/an/url',
+            referer='/an/url',
+            query_string='?a=string',
+            method='PUT',
+            view_time=datetime.fromtimestamp(1565033030),
+        )
+        response = self.client.get(
+            '/tracking/visitors/asdf/page/?page_url=%s&start=2018&end=2020' % pv.url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_visitor_page_detail_one_pageview(self):
+        visitor = Visitor.objects.create(
+            session_key='skey',
+            ip_address='127.0.0.1',
+            user=self.user,
+            time_on_site = 0,
+        )
+        pv = Pageview.objects.create(
+            visitor=visitor,
+            url='/an/url',
+            referer='/an/url',
+            query_string='?a=string',
+            method='PUT',
+            view_time=datetime.fromtimestamp(1565033030),
+        )
+        response = self.client.get(
+            '/tracking/visitors/%s/page/?page_url=%s&start=2018&end=2020' % (self.user.pk, pv.url))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['total_views'], 1)
+        self.assertEqual(response.context['avg_views_per_visit'], 1)
+        self.assertEqual(response.context['visits'].count(), 1)
+        self.assertEqual(response.context['user'], self.user)
+        self.assertEqual(response.context['page_url'], pv.url)
+
+    def test_visitor_pageview_pageview_does_not_exist(self):
+        response = self.client.get(
+            '/tracking/visitors/lkdjf/pageview/lkdjf/')
+        self.assertEqual(response.status_code, 404)
+
+    def test_visitor_pageview_one_pageview_exists(self):
+        visitor = Visitor.objects.create(
+            session_key='skey',
+            ip_address='127.0.0.1',
+            user=self.user,
+            time_on_site = 0,
+        )
+        pv = Pageview.objects.create(
+            visitor=visitor,
+            url='/an/url',
+            referer='/an/url',
+            query_string='?a=string',
+            method='PUT',
+            view_time=datetime.fromtimestamp(1565033030),
+        )
+        response = self.client.get(
+            '/tracking/visitors/%s/pageview/%s/' % (self.user.pk, pv.pk))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['pageview'], pv)
+        self.assertEqual(response.context['duration'], None)
+
+    def test_visitor_pageview_two_pageviews(self):
+        visitor = Visitor.objects.create(
+            session_key='skey',
+            ip_address='127.0.0.1',
+            user=self.user,
+            time_on_site = 0,
+        )
+        pv1_view_time = datetime.fromtimestamp(1565033030)
+        pv2_view_time = datetime.fromtimestamp(1565034030)
+        pv = Pageview.objects.create(
+            visitor=visitor,
+            url='/an/url',
+            referer='/an/url',
+            query_string='?a=string',
+            method='PUT',
+            view_time=pv1_view_time,
+        )
+        Pageview.objects.create(
+            visitor=visitor,
+            url='/an/url',
+            referer='/an/url',
+            query_string='?a=string',
+            method='PUT',
+            view_time=pv2_view_time ,
+        )
+        response = self.client.get(
+            '/tracking/visitors/%s/pageview/%s/' % (self.user.pk, pv.pk))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['pageview'], pv)
+        self.assertEqual(response.context['duration'], pv2_view_time - pv1_view_time)
+
+    def test_visitor_page_overview_no_pageviews(self):
+        response = self.client.get(
+            '/tracking/pages/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['pageview_counts'].count(), 0)
+        self.assertEqual(response.context['total_page_views'], 0)
+        self.assertEqual(response.context['total_pages'], 0)
+
+    def test_visitor_page_overview_one_pageviews(self):
+        visitor = Visitor.objects.create(
+            session_key='skey',
+            ip_address='127.0.0.1',
+            user=self.user,
+            time_on_site = 0,
+        )
+        Pageview.objects.create(
+            visitor=visitor,
+            url='/an/url',
+            referer='/an/url',
+            query_string='?a=string',
+            method='PUT',
+            view_time=datetime.fromtimestamp(1565033030),
+        )
+        response = self.client.get(
+            '/tracking/pages/?start=2018&end=2020')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['pageview_counts'].count(), 1)
+        self.assertEqual(response.context['total_page_views'], 1)
+        self.assertEqual(response.context['total_pages'], 1)
 
 class AdminViewTestCase(TestCase):
 

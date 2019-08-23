@@ -5,25 +5,10 @@
     </head>
     <body>
         <h1>Dashboard - django-tracking2</h1>
-        <div id="tracking-filters">
-            <form method="GET">
-                {{ form.as_table }}
-                <input type="submit" name="submit" value="submit" />
-            </form>
-        </div>
-        <a href={% url "tracking-page-overview" %}>Page centric statistics</a>
-        <div id="tracking-info">
-            <p>
-                Visitor tracking began on
-                {{ track_start_time|date:"Y-m-d H:i:s" }}
-            </p>
-            {% if warn_incomplete %}
-            <p class=warning>
-                The start time precedes the oldest tracked visitor, thus
-                the stats are not complete for the specified range.
-            </p>
-            {% endif %}
-        </div>
+        {% include "tracking/snippets/tracking_filters.html" %}
+        {% if has_pageviews %}
+            <a href={% url "tracking-page-overview" %}>Page centric statistics</a>
+        {% endif %}
         <div id="tracking-stats">
             {% include "tracking/snippets/stats.html" %}
         </div>
