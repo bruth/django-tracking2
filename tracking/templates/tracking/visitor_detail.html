@@ -60,12 +60,14 @@
                     <caption>Page Views</caption>
                     <thead>
                         <th>Time</th>
+                        <th>Method</th>
                         <th>URL</th>
                     </thead>
                     <tbody>
                         {% for view in pageviews %}
                         <tr>
                             <td>{{ view.view_time|date:"Y-m-d H:i:s" }}</td>
+                            <td>{{ view.method }}</td>
                             <td><a href={% url 'tracking-pageview-detail' user_id=visit.user.pk pageview_id=view.pk %} title="View pageview details">{{ view.url }}</a></td>
                         </tr>
                         {% endfor %}

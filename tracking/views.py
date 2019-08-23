@@ -82,7 +82,7 @@ def visitor_detail(request, visit_id):
     visit.time_on_site = timedelta(seconds=visit.time_on_site)
     pvcount = visit.pageviews.count()
     pageviews = visit.pageviews.order_by('-view_time')
-    pageview_stats = visit.pageviews.values('url').annotate(views=Count('url')).order_by('-views')
+    pageview_stats = visit.pageviews.values('method', 'url').annotate(views=Count('url')).order_by('-views')
     pvspaginator = Paginator(pageview_stats, TRACK_PAGING_SIZE)
     pvpaginator = Paginator(pageviews, TRACK_PAGING_SIZE)
 
