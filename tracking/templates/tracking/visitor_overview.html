@@ -9,9 +9,9 @@
     <div id="tracking-stats">
         <dl>
             <dt># Visits</dt>
-            <dd>{{ user.visit_count }}</dt>
+            <dd>{{ user.visit_count|default:"n/a" }}</dt>
             <dt>Avg. Time on Site</dt>
-            <dd>{{ user.time_on_site|default_if_none:"n/a" }}</dt>
+            <dd>{{ user.time_on_site|default:"n/a" }}</dt>
             <dt>Avg. Pages/Visit</dt>
             <dd>{{ user.pages_per_visit|floatformat|default:"n/a" }}</dt>
       </dl>

@@ -59,8 +59,12 @@ def visitor_overview(request, user_id):
     user = Visitor.objects.user_stats(start_time, end_time).filter(pk=user_id).first()
     if user:
         user.time_on_site = timedelta(seconds=user.time_on_site)
+    else:
+        # User did not visit at all during this period. Need name but not stats
+        user = get_object_or_404(get_user_model(), pk=user_id)
     visits = Visitor.objects.filter(user=user, start_time__range=(start_time, end_time))
     paginator = Paginator(visits, TRACK_PAGING_SIZE)
+    log.critical(visits)
 
     context = {
         'form': form,

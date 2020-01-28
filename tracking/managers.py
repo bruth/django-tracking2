@@ -177,16 +177,6 @@ class VisitorManager(CacheManager):
             get_user_model().USERNAME_FIELD,
         )
 
-#         # Aggregate pageviews per visit
-#         for user in users:
-#             user.pages_per_visit = user.visit_history.filter(
-#                 **visit_kwargs
-#             ).annotate(
-#                 page_count=Count('pageviews')
-#             ).filter(page_count__gt=0).aggregate(
-#                 pages_per_visit=Avg('page_count'))['pages_per_visit']
-#             # Lop off the floating point, turn into timedelta
-#             user.time_on_site = timedelta(seconds=int(user.time_on_site))
         return users
 
 
