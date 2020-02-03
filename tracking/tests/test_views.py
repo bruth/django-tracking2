@@ -122,14 +122,14 @@ class ViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_visitor_detail_no_pageviews(self):
-        Visitor.objects.create(
+        visitor = Visitor.objects.create(
             session_key='skey',
             ip_address='127.0.0.1',
             user=self.user,
             time_on_site = 0,
         )
         response = self.client.get(
-            '/tracking/visits/%s/' % self.user.pk)
+            '/tracking/visits/%s/' % visitor.pk)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['pvcount'], 0)
 
@@ -149,10 +149,10 @@ class ViewsTestCase(TestCase):
             view_time=datetime.fromtimestamp(1565033030),
         )
         response = self.client.get(
-            '/tracking/visits/%s/?start=2018&end=2020' % self.user.pk)
+            '/tracking/visits/%s/?start=2018&end=2020' % visitor.pk)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['pageviews'].count(), 1)
-        self.assertEqual(response.context['pageview_stats'].count(), 1)
+        self.assertEqual(len(response.context['pageviews']), 1)
+        self.assertEqual(len(response.context['pageview_stats']), 1)
         self.assertEqual(response.context['pvcount'], 1)
         self.assertEqual(response.context['visit'], visitor)
 
@@ -162,14 +162,14 @@ class ViewsTestCase(TestCase):
             ip_address='127.0.0.1',
             user=self.user,
             time_on_site = 0,
+            start_time=datetime.fromtimestamp(1565033030),
         )
         response = self.client.get(
             '/tracking/visitors/%s/page/?page_url=asdf/' % self.user.pk)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['visits'].count(), 0)
         self.assertEqual(response.context['total_views'], 0)
         self.assertEqual(response.context['avg_views_per_visit'], 0)
-        self.assertEqual(response.context['visits'].count(), 1)
+        self.assertEqual(len(response.context['visits']), 0)
         self.assertEqual(response.context['user'], self.user)
 
     def test_visitor_page_detail_user_does_not_exist(self):
@@ -188,7 +188,7 @@ class ViewsTestCase(TestCase):
             view_time=datetime.fromtimestamp(1565033030),
         )
         response = self.client.get(
-            '/tracking/visitors/asdf/page/?page_url=%s&start=2018&end=2020' % pv.url)
+            '/tracking/visitors/80085/page/?page_url=%s&start=2018&end=2020' % pv.url)
         self.assertEqual(response.status_code, 404)
 
     def test_visitor_page_detail_one_pageview(self):
@@ -197,6 +197,7 @@ class ViewsTestCase(TestCase):
             ip_address='127.0.0.1',
             user=self.user,
             time_on_site = 0,
+            start_time=datetime.fromtimestamp(1565033030),
         )
         pv = Pageview.objects.create(
             visitor=visitor,
@@ -211,13 +212,13 @@ class ViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['total_views'], 1)
         self.assertEqual(response.context['avg_views_per_visit'], 1)
-        self.assertEqual(response.context['visits'].count(), 1)
+        self.assertEqual(len(response.context['visits']), 1)
         self.assertEqual(response.context['user'], self.user)
         self.assertEqual(response.context['page_url'], pv.url)
 
     def test_visitor_pageview_pageview_does_not_exist(self):
         response = self.client.get(
-            '/tracking/visitors/lkdjf/pageview/lkdjf/')
+            '/tracking/visitors/80085/pageview/1337/')
         self.assertEqual(response.status_code, 404)
 
     def test_visitor_pageview_one_pageview_exists(self):
@@ -276,7 +277,7 @@ class ViewsTestCase(TestCase):
         response = self.client.get(
             '/tracking/pages/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['pageview_counts'].count(), 0)
+        self.assertEqual(len(response.context['pageview_counts']), 0)
         self.assertEqual(response.context['total_page_views'], 0)
         self.assertEqual(response.context['total_pages'], 0)
 
@@ -298,7 +299,7 @@ class ViewsTestCase(TestCase):
         response = self.client.get(
             '/tracking/pages/?start=2018&end=2020')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['pageview_counts'].count(), 1)
+        self.assertEqual(len(response.context['pageview_counts']), 1)
         self.assertEqual(response.context['total_page_views'], 1)
         self.assertEqual(response.context['total_pages'], 1)
 

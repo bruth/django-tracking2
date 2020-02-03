@@ -31,7 +31,7 @@ from tracking.models import Visitor  # noqa
 dj_version = django.get_version()
 broken_geoip = (dj_version[:3] == '1.5') and (sys.version_info[0] == 3)
 
-
+@skipIf(not HAS_GEOIP, "Don't run tests if don't have GEOIP")
 class GeoIPTestCase(TestCase):
 
     def test_geoip_none(self):

@@ -131,8 +131,8 @@ def visitor_page_detail(request, user_id):
     paginator = Paginator(visits, TRACK_PAGING_SIZE)
 
     context = {
-        'total_views': aggs['views__sum'],
-        'avg_views_per_visit': aggs['views__avg'],
+        'total_views': aggs['views__sum'] if aggs['views__sum'] else 0,
+        'avg_views_per_visit': aggs['views__avg'] if aggs['views__avg'] else 0,
         'visits': paginator.page(page),
         'user': user,
         'page_url': page_url,
