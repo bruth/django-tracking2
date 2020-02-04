@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{% firstof user.get_full_name user %} Visits Overview - django-tracking2</title>
+</head>
+<body>
+    <h1>{% firstof user.get_full_name user %} Visits Overview - django-tracking2</h1>
+    {% include "tracking/snippets/tracking_filters.html" %}
+    <div id="tracking-stats">
+        <dl>
+            <dt># Visits</dt>
+            <dd>{{ user.visit_count|default:"n/a" }}</dt>
+            <dt>Avg. Time on Site</dt>
+            <dd>{{ user.time_on_site|default:"n/a" }}</dt>
+            <dt>Avg. Pages/Visit</dt>
+            <dd>{{ user.pages_per_visit|floatformat|default:"n/a" }}</dt>
+      </dl>
+      
+        {% if visits.has_previous %}
+            <a href="{% url 'tracking-visitor-overview' user_id=user.pk %}?page={{ visits.previous_page_number }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}">previous</a>
+        {% endif %}
+        {% if visits.has_next %}
+            <a href="{% url 'tracking-visitor-overview' user_id=user.pk %}?page={{ visits.next_page_number }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}">next</a>
+        {% endif %}
+        <table>
+            <caption>Visits by {% firstof user.get_full_name user %}</caption>
+            <thead>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Page Views</th>
+                {% if has_geoip %}
+                    <th>Location</th>
+                {% endif %}
+            </thead>
+            <tbody>
+                {% for visit in visits %}
+                <tr>
+                    <td><a href={% url 'tracking-visitor-detail' visit_id=visit.pk %} title="Click to see visit details">{{ visit.start_time|date:"Y-m-d H:i:s" }}</a></td>
+                    <td><a href={% url 'tracking-visitor-detail' visit_id=visit.pk %} title="Click to see visit details">{{ visit.end_time|date:"Y-m-d H:i:s" }}</a></td>
+                    <td><a href={% url 'tracking-visitor-detail' visit_id=visit.pk %} title="Click to see visit details">{{ visit.pageviews.count }}</a></td>
+                    {% if has_geoip %}
+                        <td><a href={% url 'tracking-visitor-detail' visit_id=visit.pk %} title="Click to see visit details">{{ visit.geoip_data.city }}, {{ visit.geoip_data.region }}, {{ visit.geoip_data.country_code }} {{ visit.geoip_data.postal_code }}</a></td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>	    
+        </table>
+        {% if visits.has_previous %}
+            <a href="{% url 'tracking-visitor-overview' user_id=user.pk %}?page={{ visits.previous_page_number }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}">previous</a>
+        {% endif %}
+        {% if visits.has_next %}
+            <a href="{% url 'tracking-visitor-overview' user_id=user.pk %}?page={{ visits.next_page_number }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}">next</a>
+        {% endif %}
+    </div>
+</body>
+</html>

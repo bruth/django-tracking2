@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{% firstof pageview.visitor.user.get_full_name pageview.visitor.user.user %}'s View of {{ pageview.url }} at {{ pageview.view_time|date:"Y-m-d H:i:s" }} - django-tracking2</title>
+</head>
+<body>
+    <h1>{% firstof pageview.visitor.user.get_full_name pageview.visitor.user.user %}'s View of {{ pageview.url }} at {{ pageview.view_time|date:"Y-m-d H:i:s" }} - django-tracking2</h1>
+    <div id="tracking-stats">
+        <dl>
+            <dt>Method</dt>
+            <dd>{{ pageview.method }}</dt>
+            <dt>Duration</dt>
+            <dd>{{ duration }}</dt>
+            {% if pageview.referer %}
+                <dt>Referrer</dt>
+                <dd>{{ pageview.referer }}</dt>
+            {% endif %}
+            {% if pageview.query_string %}
+                <dt>Query String</dt>
+                <dd>{{ pageview.query_string }}</dt>
+            {% endif %}
+        </dl>
+    </div>
+    <a href={% url 'tracking-page-detail' %}?page_url={{ pageview.url }}>Page details across all visitors</a>
+</body>
+</html>

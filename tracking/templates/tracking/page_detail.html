@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{ page_url }} Details - django-tracking2</title>
+</head>
+<body>
+    <h1>{{ page_url }} Details - django-tracking2</h1>
+    {% include "tracking/snippets/tracking_filters.html" %}
+    <div id="tracking-stats">
+        <dl>
+            <dt>Total Views</dt>
+            <dd>{{ total_views }}</dt>
+            <dt># of Unique Visitors</dt>
+            <dd>{{ visitors }}</dt>
+        </dl>
+        {% if pageviews.has_previous %}
+            <a href="{% url 'tracking-page-detail' %}?page_url={{ page_url }}&page={{ pageviews.previous_page_number }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}">previous</a>
+        {% endif %}
+        {% if pageviews.has_next %}
+            <a href="{% url 'tracking-page-detail' %}?page_url={{ page_url }}&page={{ pageviews.next_page_number }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}">next</a>
+        {% endif %}
+        <table>
+            <caption>Pageviews</caption>
+            <thead>
+                <th>Time</th>
+                <th>User</th>
+                <th>Method</th>
+                <th>URL</th>
+            </thead>
+            <tbody>
+                {% for pv in pageviews %}
+                <tr>
+                    <td><a href="{% url 'tracking-visitor-page-detail' user_id=pv.visitor.user.pk %}?page_url={{ page_url }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}" title="View visits by {% firstof pv.visitor.user.get_full_name pv.visitor.user %} involving {{ page_url }}">{{ pv.view_time|date:"Y-m-d H:i:s" }}</a></td>
+                    <td><a href="{% url 'tracking-visitor-page-detail' user_id=pv.visitor.user.pk %}?page_url={{ page_url }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}" title="View visits by {% firstof pv.visitor.user.get_full_name pv.visitor.user %} involving {{ page_url }}">{% firstof pv.visitor.user.get_full_name pv.visitor.user %}</a></td>
+                    <td><a href="{% url 'tracking-visitor-page-detail' user_id=pv.visitor.user.pk %}?page_url={{ page_url }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}" title="View visits by {% firstof pv.visitor.user.get_full_name pv.visitor.user %} involving {{ page_url }}">{{ pv.method }}</a></td>
+                    <td><a href="{% url 'tracking-visitor-page-detail' user_id=pv.visitor.user.pk %}?page_url={{ page_url }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}" title="View visits by {% firstof pv.visitor.user.get_full_name pv.visitor.user %} involving {{ page_url }}">{{ page_url }}</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>	    
+        </table>
+        {% if pageviews.has_previous %}
+            <a href="{% url 'tracking-page-detail' %}?page_url={{ page_url }}&page={{ pageviews.previous_page_number }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}">previous</a>
+        {% endif %}
+        {% if pageviews.has_next %}
+            <a href="{% url 'tracking-page-detail' %}?page_url={{ page_url }}&page={{ pageviews.next_page_number }}&start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}">next</a>
+        {% endif %}
+    </div>
+</body>
+</html>

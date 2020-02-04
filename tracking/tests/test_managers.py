@@ -84,7 +84,7 @@ class VisitorManagerTestCase(TestCase):
         # now expand the end time to include `future` as well
         end_time = start_time + timedelta(days=3)
         stats = Visitor.objects.stats(start_time, end_time)
-        self.assertEqual(stats['pages_per_visit'], 4 / 3)
+        self.assertAlmostEqual(stats['pages_per_visit'], 4 / 3, places=4)
         guests = {
             'time_on_site': timedelta(seconds=30),
             'unique': 1,
@@ -156,7 +156,7 @@ class VisitorManagerTestCase(TestCase):
         user = stats[0]
         self.assertEqual(user.username, self.user2.username)
         self.assertEqual(user.visit_count, 1)
-        self.assertEqual(user.time_on_site, timedelta(seconds=30))
+        self.assertAlmostEqual(user.time_on_site, 30)
         self.assertEqual(user.pages_per_visit, 1)
 
         # no start_time
@@ -166,13 +166,13 @@ class VisitorManagerTestCase(TestCase):
         user1 = stats[1]
         self.assertEqual(user1.username, self.user1.username)
         self.assertEqual(user1.visit_count, 1)
-        self.assertEqual(user1.time_on_site, timedelta(seconds=30))
+        self.assertAlmostEqual(user1.time_on_site, 30)
         self.assertEqual(user1.pages_per_visit, 2.0)
 
         user2 = stats[0]
         self.assertEqual(user2.username, self.user2.username)
         self.assertEqual(user2.visit_count, 1)
-        self.assertEqual(user2.time_on_site, timedelta(seconds=30))
+        self.assertAlmostEqual(user2.time_on_site, 30)
         self.assertEqual(user2.pages_per_visit, 1)
 
     def test_pageview_stats(self):

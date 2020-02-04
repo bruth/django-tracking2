@@ -1,13 +1,16 @@
 from __future__ import division
 
+import logging
+
 from datetime import timedelta
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.db.models import Count, Avg
+from django.db.models import Count, Avg, Sum, Max
 from tracking.settings import TRACK_PAGEVIEWS, TRACK_ANONYMOUS_USERS
 from tracking.cache import CacheManager
 
+log = logging.getLogger(__file__)
 
 class VisitorManager(CacheManager):
     def active(self, registered_only=True):
@@ -163,25 +166,18 @@ class VisitorManager(CacheManager):
         else:
             user_kwargs['visit_history__start_time__isnull'] = False
             visit_kwargs['start_time__isnull'] = False
-
-        users = list(get_user_model().objects.filter(**user_kwargs).annotate(
-            visit_count=Count('visit_history'),
+            
+        users = get_user_model().objects.filter(**user_kwargs).annotate(
+            visit_count=Count('visit_history', distinct=True),
             time_on_site=Avg('visit_history__time_on_site'),
+            page_count=Count('visit_history__pageviews', distinct=True),
+            pages_per_visit=Count('visit_history__pageviews', distinct=True)/Count('visit_history', distinct=True),
+            last_pageview=Max('visit_history__pageviews__view_time'),
         ).filter(visit_count__gt=0).order_by(
             '-time_on_site',
             get_user_model().USERNAME_FIELD,
-        ))
+        )
 
-        # Aggregate pageviews per visit
-        for user in users:
-            user.pages_per_visit = user.visit_history.filter(
-                **visit_kwargs
-            ).annotate(
-                page_count=Count('pageviews')
-            ).filter(page_count__gt=0).aggregate(
-                pages_per_visit=Avg('page_count'))['pages_per_visit']
-            # Lop off the floating point, turn into timedelta
-            user.time_on_site = timedelta(seconds=int(user.time_on_site))
         return users
 
 

@@ -62,15 +62,17 @@
             <th># Visits</th>
             <th>Avg. Time on Site</th>
             <th>Avg. Pages/Visit</th>
+            <th>Last Pageview</th>
         </tr>
     </thead>
     <tbody>
         {% for user in user_stats %}
         <tr>
-            <th>{% firstof user.get_full_name user %}</th>
+            <th><a href="{% url 'tracking-visitor-overview' user_id=user.pk %}?start={{ start_time|date:"Y-m-d H:i:s" }}&end={{ end_time|date:"Y-m-d H:i:s" }}" title="Click to view visits by {% firstof user.get_full_name user %}">{% firstof user.get_full_name user %}</a></th>
             <td>{{ user.visit_count }}</td>
             <td>{{ user.time_on_site|default_if_none:"n/a" }}</td>
             <td>{{ user.pages_per_visit|floatformat|default:"n/a" }}</td>
+            <td>{{ user.last_pageview|default:"n/a" }}</td>
         </tr>
         {% endfor %}
     </tbody>
