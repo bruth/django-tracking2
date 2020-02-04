@@ -62,6 +62,7 @@
             <th># Visits</th>
             <th>Avg. Time on Site</th>
             <th>Avg. Pages/Visit</th>
+            <th>Last Pageview</th>
         </tr>
     </thead>
     <tbody>
@@ -71,6 +72,7 @@
             <td>{{ user.visit_count }}</td>
             <td>{{ user.time_on_site|default_if_none:"n/a" }}</td>
             <td>{{ user.pages_per_visit|floatformat|default:"n/a" }}</td>
+            <td>{{ user.last_pageview|default:"n/a" }}</td>
         </tr>
         {% endfor %}
     </tbody>

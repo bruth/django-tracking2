@@ -6,7 +6,7 @@ from datetime import timedelta
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.db.models import Count, Avg, Sum
+from django.db.models import Count, Avg, Sum, Max
 from tracking.settings import TRACK_PAGEVIEWS, TRACK_ANONYMOUS_USERS
 from tracking.cache import CacheManager
 
@@ -172,6 +172,7 @@ class VisitorManager(CacheManager):
             time_on_site=Avg('visit_history__time_on_site'),
             page_count=Count('visit_history__pageviews', distinct=True),
             pages_per_visit=Count('visit_history__pageviews', distinct=True)/Count('visit_history', distinct=True),
+            last_pageview=Max('visit_history__pageviews__view_time'),
         ).filter(visit_count__gt=0).order_by(
             '-time_on_site',
             get_user_model().USERNAME_FIELD,
