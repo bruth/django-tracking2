@@ -1,24 +1,10 @@
 import re
-import sys
+from unittest.mock import patch
 
-import django
 from django.contrib.auth.models import User
 from django.test import TestCase
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
 
 from tracking.models import Visitor, Pageview
-
-if sys.version_info[0] == 3:
-    def _u(s):
-        return s
-else:
-    def _u(s):
-        return unicode(s)
-
-OLD_VERSION = django.VERSION < (1, 10)
 
 
 class MiddlewareTestCase(TestCase):
@@ -27,8 +13,7 @@ class MiddlewareTestCase(TestCase):
     def test_no_session(self, mock_warnings):
         # ignore if session middleware is not present
         tracking = 'tracking.middleware.VisitorTrackingMiddleware'
-        middleware = 'MIDDLEWARE_CLASSES' if OLD_VERSION else 'MIDDLEWARE'
-        with self.settings(**{middleware: [tracking]}):
+        with self.settings(MIDDLEWARE=[tracking]):
             self.client.get('/')
         self.assertEqual(Visitor.objects.count(), 0)
         self.assertEqual(Pageview.objects.count(), 0)
@@ -70,7 +55,7 @@ class MiddlewareTestCase(TestCase):
         self.assertEqual(visitor.user_agent, 'django')
 
     def test_track_user_agent_unicode(self):
-        self.client.get('/', HTTP_USER_AGENT=_u('django'))
+        self.client.get('/', HTTP_USER_AGENT='django')
         self.assertEqual(Visitor.objects.count(), 1)
         visitor = Visitor.objects.get()
         self.assertEqual(visitor.user_agent, 'django')

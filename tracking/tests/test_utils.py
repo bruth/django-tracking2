@@ -1,8 +1,5 @@
 from django.test import TestCase
-try:
-    from unittest.mock import Mock
-except ImportError:
-    from mock import Mock
+from unittest.mock import Mock
 
 from tracking.utils import get_ip_address
 

@@ -2,7 +2,6 @@ import re
 import logging
 import warnings
 
-import django
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 from django.utils.encoding import smart_text
@@ -31,13 +30,6 @@ track_ignore_user_agents = [
 ]
 
 log = logging.getLogger(__file__)
-
-if django.VERSION < (1, 10):
-    def is_anonymous(user):
-        return user.is_anonymous()
-else:
-    def is_anonymous(user):
-        return user.is_anonymous
 
 
 class VisitorTrackingMiddleware(MiddlewareMixin):
@@ -148,7 +140,7 @@ class VisitorTrackingMiddleware(MiddlewareMixin):
         # session since if authentication happens, the `session_key` carries
         # over, thus having a more accurate start time of session
         user = getattr(request, 'user', None)
-        if user and is_anonymous(user):
+        if user and user.is_anonymous:
             # set AnonymousUsers to None for simplicity
             user = None
 
