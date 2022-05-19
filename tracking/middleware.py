@@ -4,7 +4,7 @@ import warnings
 
 from django.db import IntegrityError, transaction
 from django.utils import timezone
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_str
 try:
     from django.utils.deprecation import MiddlewareMixin
 except ImportError:
@@ -98,7 +98,7 @@ class VisitorTrackingMiddleware(MiddlewareMixin):
         # grab the latest User-Agent and store it
         user_agent = request.META.get('HTTP_USER_AGENT', None)
         if user_agent:
-            visitor.user_agent = smart_text(
+            visitor.user_agent = smart_str(
                 user_agent, encoding='latin-1', errors='ignore')
 
         time_on_site = 0
