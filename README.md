@@ -21,7 +21,7 @@ Requirements
 ============
 * Django's [session framework][1] installed
 
-[1]: https://docs.djangoproject.com/en/1.11/topics/http/sessions/
+[1]: https://docs.djangoproject.com/en/3.2/topics/http/sessions/
 
 Download
 ========
@@ -41,7 +41,7 @@ INSTALLED_APPS = (
 )
 ```
 
-If you use Django 1.8+ `tracking` app should follow the app with your user model
+The `tracking` app should follow the app with your user model
 
 Add `tracking.middleware.VisitorTrackingMiddleware` to your project's
 `MIDDLEWARE_CLASSES` before the `SessionMiddleware`:
@@ -54,10 +54,6 @@ MIDDLEWARE_CLASSES = (
     ...
 )
 ```
-
-Django 1.11 - 2.1
-------------
-If you are upgrading from previous versions to Django 2.1, you must apply migrations again.
 
 Settings
 --------
@@ -100,11 +96,11 @@ do the following:
 Include `tracking.urls` in your `urls.py`:
 
 ```python
-urlpatterns = patterns('',
+urlpatterns = [
     ...
-    url(r'^tracking/', include('tracking.urls')),
+    re_path(r'^tracking/', include('tracking.urls')),
     ...
-)
+]
 ```
 
 These urls are protected by a custom Django permission `tracking.visitor_log`.
