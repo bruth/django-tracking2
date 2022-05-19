@@ -42,7 +42,10 @@ class VisitorTrackingMiddleware(MiddlewareMixin):
             return False
 
         # Do not track AJAX requests
-        if request.is_ajax() and not TRACK_AJAX_REQUESTS:
+        if (
+            request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+            and not TRACK_AJAX_REQUESTS
+        ):
             return False
 
         # Do not track if HTTP HttpResponse status_code blacklisted
