@@ -1,7 +1,7 @@
-from django.conf.urls import url
+from django.urls import re_path
 
 from tracking.views import dashboard
 
 urlpatterns = [
-    url(r'^$', dashboard, name='tracking-dashboard'),
+    re_path(r'^$', dashboard, name='tracking-dashboard'),
 ]

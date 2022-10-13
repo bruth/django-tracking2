@@ -7,19 +7,10 @@ from django.utils import timezone
 from tracking.managers import VisitorManager, PageviewManager
 from tracking.settings import TRACK_USING_GEOIP
 
-try:
-    from django.contrib.gis.geoip import HAS_GEOIP
-except ImportError:
-    from django.contrib.gis.geoip2 import HAS_GEOIP2 as HAS_GEOIP
+from django.contrib.gis.geoip2 import HAS_GEOIP2 as HAS_GEOIP
 
 if HAS_GEOIP:
-    try:
-        from django.contrib.gis.geoip import GeoIP, GeoIPException
-    except ImportError:
-        from django.contrib.gis.geoip2 import (
-            GeoIP2 as GeoIP,
-            GeoIP2Exception as GeoIPException,
-        )
+    from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
 
 GEOIP_CACHE_TYPE = getattr(settings, 'GEOIP_CACHE_TYPE', 4)
 
@@ -67,9 +58,9 @@ class Visitor(models.Model):
         if not hasattr(self, '_geoip_data'):
             self._geoip_data = None
             try:
-                gip = GeoIP(cache=GEOIP_CACHE_TYPE)
+                gip = GeoIP2(cache=GEOIP_CACHE_TYPE)
                 self._geoip_data = gip.city(self.ip_address)
-            except GeoIPException:
+            except GeoIP2Exception:
                 msg = 'Error getting GeoIP data for IP "{0}"'.format(
                     self.ip_address)
                 log.exception(msg)
